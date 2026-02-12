@@ -1,0 +1,351 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: #3d3d3d;  /* Светло-черный/Charcoal */
+    --bg-secondary: #22262b;
+    --surface: #2c3035;
+    --surface-hover: #353a40;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b8c5;
+    --border: #3a4048;
+    --border-focused: #5f6a7a;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Логотип слева сверху */
+.logo-header {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+    padding: 8px 16px;
+    border-radius: 100px;
+    background: rgba(44, 48, 53, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+}
+
+.logo-small {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #6b7c93, #526277);
+    border-radius: 10px;
+    position: relative;
+}
+
+.logo-small::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+.logo-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    letter-spacing: -0.3px;
+}
+
+.container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Центр экрана */
+.center-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+    padding: 0 20px;
+    transition: opacity 0.3s ease;
+}
+
+.welcome-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* Чат область */
+.chat-area {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    bottom: 100px;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.messages {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Сообщения */
+.message {
+    display: flex;
+    gap: 16px;
+    padding: 24px 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.user .message-content {
+    background: var(--surface);
+    padding: 12px 18px;
+    border-radius: 20px 20px 4px 20px;
+    max-width: 80%;
+}
+
+.message.assistant {
+    background: transparent;
+}
+
+.message.assistant .message-content {
+    background: var(--surface-hover);
+    padding: 12px 18px;
+    border-radius: 20px 20px 20px 4px;
+    max-width: 80%;
+}
+
+.message-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.message.user .message-text {
+    color: white;
+}
+
+/* ПОЛЕ ВВОДА - ПРИЖАТО К НИЗУ */
+.input-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px 30px;
+    background: linear-gradient(to top, var(--bg-primary) 90%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.input-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 8px 8px 24px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--border-focused);
+    background: var(--surface-hover);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.input-wrapper textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    max-height: 120px;
+    resize: none;
+    padding: 12px 0;
+}
+
+.input-wrapper textarea::placeholder {
+    color: var(--text-secondary);
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+/* КНОПКА - ПРОСТО БЕЛАЯ СТРЕЛКА */
+.send-btn {
+    background: transparent;  /* Прозрачный фон */
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    opacity: 0.5;  /* Полупрозрачная когда нет текста */
+}
+
+.send-btn.active {
+    opacity: 1;  /* Яркая когда есть текст */
+}
+
+.send-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+.send-btn:active {
+    transform: scale(0.95);
+}
+
+.send-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.send-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: white;  /* Белая стрелка */
+    stroke-width: 2;
+}
+
+/* Индикатор печатания */
+.typing-indicator {
+    display: flex;
+    gap: 6px;
+    padding: 16px 20px;
+    background: var(--surface-hover);
+    border-radius: 20px;
+    width: fit-content;
+    margin-left: 20px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* МОБИЛЬНАЯ АДАПТАЦИЯ */
+@media (max-width: 600px) {
+    .logo-header {
+        top: 16px;
+        left: 16px;
+        padding: 6px 14px;
+    }
+
+    .logo-small {
+        width: 24px;
+        height: 24px;
+    }
+
+    .logo-name {
+        font-size: 15px;
+    }
+
+    .welcome-title {
+        font-size: 28px;
+    }
+
+    .input-container {
+        padding: 12px 16px 25px;
+    }
+
+    .input-wrapper {
+        padding: 6px 6px 6px 20px;
+    }
+
+    .input-wrapper textarea {
+        font-size: 16px;
+        padding: 10px 0;
+    }
+
+    .send-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .send-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .message {
+        padding: 20px 16px;
+    }
+
+    .chat-area {
+        top: 70px;
+        bottom: 90px;
+    }
+}
+
+@media (max-width: 380px) {
+    .welcome-title {
+        font-size: 24px;
+    }
+
+    .input-wrapper {
+        padding: 4px 4px 4px 16px;
+    }
+
+    .send-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
