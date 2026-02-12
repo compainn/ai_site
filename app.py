@@ -12,8 +12,8 @@ app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 app.permanent_session_lifetime = timedelta(days=30)
 
-# Конфигурация из твоего бота
-OPENROUTER_API_KEY = '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'
+# Конфигурация
+OPENROUTER_API_KEY = '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'
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 MODELS = [
@@ -53,37 +53,28 @@ ai_client = AsyncOpenAI(
     api_key=OPENROUTER_API_KEY,
 )
 
-# Хранилище контекста для сессий
 context_storage = {}
 
-
 def get_session_id():
-    """Получить или создать ID сессии"""
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
     return session['session_id']
 
-
 def get_context(session_id):
-    """Получить контекст для сессии"""
     if session_id not in context_storage:
         context_storage[session_id] = [
             {"role": "system", "content": SYSTEM_PROMPT}
         ]
     return context_storage[session_id]
 
-
 def trim_context(session_id):
-    """Обрезать контекст"""
     context = context_storage[session_id]
     if len(context) > MAX_CONTEXT_LENGTH:
         system_msg = context[0]
         recent_msgs = context[-(MAX_CONTEXT_LENGTH - 1):]
         context_storage[session_id] = [system_msg] + recent_msgs
 
-
 def clean_response(text):
-    """Очистка ответа от спецсимволов"""
     if not text:
         return text
 
@@ -128,40 +119,29 @@ def clean_response(text):
 
     return '\n'.join(cleaned_lines).strip()
 
-
 def async_route(f):
-    """Декоратор для асинхронных маршрутов"""
-
     @wraps(f)
     def wrapped(*args, **kwargs):
         return asyncio.run(f(*args, **kwargs))
-
     return wrapped
-
 
 @app.route('/')
 def index():
-    """Главная страница"""
     session_id = get_session_id()
-    # Создаем контекст если его нет
     get_context(session_id)
     return render_template('index.html')
 
-
 @app.route('/clear', methods=['POST'])
 def clear_context():
-    """Очистить контекст"""
     session_id = get_session_id()
     context_storage[session_id] = [
         {"role": "system", "content": SYSTEM_PROMPT}
     ]
     return jsonify({'status': 'success', 'message': 'История очищена'})
 
-
 @app.route('/chat', methods=['POST'])
 @async_route
 async def chat():
-    """Обработка сообщений"""
     try:
         data = request.json
         message = data.get('message', '').strip()
@@ -171,13 +151,10 @@ async def chat():
 
         session_id = get_session_id()
         context = get_context(session_id)
-
-        # Добавляем сообщение пользователя
         context.append({"role": "user", "content": message})
 
         last_error = None
 
-        # Пробуем модели по очереди
         for model in MODELS:
             try:
                 response = await ai_client.chat.completions.create(
@@ -190,7 +167,6 @@ async def chat():
                 answer = response.choices[0].message.content
                 clean_answer = clean_response(answer)
 
-                # Добавляем ответ в контекст
                 context.append({"role": "assistant", "content": answer})
                 trim_context(session_id)
 
@@ -201,12 +177,10 @@ async def chat():
 
             except Exception as e:
                 last_error = str(e)
-                error = str(e)
-                if "429" in error or "Rate limit" in error or "rate" in error.lower():
+                if "429" in str(e) or "Rate limit" in str(e) or "rate" in str(e).lower():
                     continue
                 continue
 
-        # Если все модели не сработали
         if context[-1]["role"] == "user":
             context.pop()
 
@@ -218,17 +192,18 @@ async def chat():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
 @app.route('/new_chat', methods=['POST'])
 def new_chat():
-    """Начать новый чат"""
     session_id = get_session_id()
     context_storage[session_id] = [
         {"role": "system", "content": SYSTEM_PROMPT}
     ]
     return jsonify({'status': 'success', 'message': 'Новый чат создан'})
 
-
+#if __name__ == '__main__':
+    #app.run(debug=True, port=5000)
+    
 if __name__ == '__main__':
+    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
