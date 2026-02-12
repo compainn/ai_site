@@ -38,7 +38,9 @@ body {
     padding: 0;
     background: none;
     backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border: none;
+    box-shadow: none;
 }
 
 .logo-image {
@@ -54,7 +56,6 @@ body {
     color: white;
     letter-spacing: -0.3px;
 }
-
 .container {
     height: 100vh;
     display: flex;
