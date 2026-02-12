@@ -97,39 +97,16 @@ class PulseAI {
     }
 
     formatText(text) {
-    // Экранируем HTML
     const div = document.createElement('div');
     div.textContent = text;
     text = div.innerHTML;
 
-    // Убираем Markdown таблицы и мусор
-    text = text.replace(/\|/g, '');              // убираем пайпы |
-    text = text.replace(/[-]{3,}/g, '');         // убираем разделители ---
-    text = text.replace(/#{1,6}\s?/g, '');       // убираем заголовки #
-    text = text.replace(/\*\*/g, '');            // убираем **
-    text = text.replace(/__/g, '');              // убираем __
-    text = text.replace(/\*/g, '');              // убираем *
-    text = text.replace(/_/g, '');               // убираем _
-    text = text.replace(/`{3}/g, '');            // убираем ```
-    text = text.replace(/`/g, '');               // убираем `
-    text = text.replace(/\[.*?\]\(.*?\)/g, '');  // убираем ссылки [text](url)
-    
-    // ===== ДОБАВЛЯЕМ ЭТИ ТРИ СТРОКИ =====
-    text = text.replace(/\|/g, '');              // УБИРАЕМ ВСЕ ПАЙПЫ |
-    text = text.replace(/[-]{3,}/g, '');         // УБИРАЕМ ---
-    text = text.replace(/\|/g, '');              // ЕЩЕ РАЗ НА ВСЯКИЙ
-    // ===================================
-
-    // Блоки кода (если остались)
     text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
     text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // УБИРАЕМ ПРИНУДИТЕЛЬНЫЕ ПЕРЕНОСЫ СТРОК
-    // text = text.replace(/\n/g, '<br>');  // ЗАКОММЕНТИРОВАНО
+    text = text.replace(/\n/g, '<br>');
 
     return text;
 }
-
     showTypingIndicator() {
         const indicator = document.createElement('div');
         indicator.className = 'typing-indicator';
