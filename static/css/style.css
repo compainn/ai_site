@@ -33,40 +33,25 @@ body {
     left: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;           /* Чуть больше расстояние между лого и текстом */
     z-index: 100;
-    padding: 8px 16px;
-    border-radius: 100px;
-    background: rgba(44, 48, 53, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
+    padding: 0;          /* УБРАЛ ПАДДИНГ */
+    background: none;    /* УБРАЛ ФОН */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;        /* УБРАЛ РАМКУ */
 }
 
-.logo-small {
-    width: 28px;
-    height: 28px;
-    background: linear-gradient(135deg, #6b7c93, #526277);
-    border-radius: 10px;
-    position: relative;
-}
-
-.logo-small::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 12px;
-    height: 12px;
-    background: white;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+.logo-image {
+    width: 36px;         /* УВЕЛИЧИЛ С 28px ДО 36px */
+    height: 36px;        /* УВЕЛИЧИЛ С 28px ДО 36px */
+    border-radius: 12px; /* Чуть больше скругление */
+    object-fit: cover;
 }
 
 .logo-name {
     font-weight: 600;
-    font-size: 16px;
+    font-size: 20px;     /* УВЕЛИЧИЛ С 16px ДО 20px */
     color: white;
     letter-spacing: -0.3px;
 }
