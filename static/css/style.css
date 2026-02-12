@@ -5,7 +5,7 @@
 }
 
 :root {
-    --bg-primary: #3d3d3d;  /* Светло-черный/Charcoal */
+    --bg-primary: #3d3d3d;
     --bg-secondary: #22262b;
     --surface: #2c3035;
     --surface-hover: #353a40;
@@ -26,32 +26,31 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Логотип слева сверху */
+/* Логотип слева сверху - БЕЗ РАМКИ */
 .logo-header {
     position: fixed;
     top: 20px;
     left: 20px;
     display: flex;
     align-items: center;
-    gap: 12px;           /* Чуть больше расстояние между лого и текстом */
+    gap: 12px;
     z-index: 100;
-    padding: 0;          /* УБРАЛ ПАДДИНГ */
-    background: none;    /* УБРАЛ ФОН */
+    padding: 0;
+    background: none;
     backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    border: none;        /* УБРАЛ РАМКУ */
+    border: none;
 }
 
 .logo-image {
-    width: 36px;         /* УВЕЛИЧИЛ С 28px ДО 36px */
-    height: 36px;        /* УВЕЛИЧИЛ С 28px ДО 36px */
-    border-radius: 12px; /* Чуть больше скругление */
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
     object-fit: cover;
 }
 
 .logo-name {
     font-weight: 600;
-    font-size: 20px;     /* УВЕЛИЧИЛ С 16px ДО 20px */
+    font-size: 20px;
     color: white;
     letter-spacing: -0.3px;
 }
@@ -103,8 +102,10 @@ body {
 .message {
     display: flex;
     gap: 16px;
-    padding: 24px 20px;
+    padding: 8px 20px;
     animation: fadeIn 0.3s ease;
+    max-width: 100%;
+    width: 100%;
 }
 
 .message.user {
@@ -113,33 +114,86 @@ body {
 
 .message.user .message-content {
     background: var(--surface);
-    padding: 12px 18px;
+    padding: 8px 16px;
     border-radius: 20px 20px 4px 20px;
     max-width: 80%;
-}
-
-.message.assistant {
-    background: transparent;
+    width: fit-content;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .message.assistant .message-content {
     background: var(--surface-hover);
-    padding: 12px 18px;
+    padding: 8px 16px;
     border-radius: 20px 20px 20px 4px;
     max-width: 80%;
+    width: fit-content;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .message-text {
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.5;
     color: var(--text-primary);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .message.user .message-text {
     color: white;
 }
 
-/* ПОЛЕ ВВОДА - ПРИЖАТО К НИЗУ */
+/* Длинные ссылки */
+.message-text a {
+    word-break: break-all;
+    color: #8ab4f8;
+    text-decoration: none;
+}
+
+.message-text a:hover {
+    text-decoration: underline;
+}
+
+/* Блоки кода - БЕЗ ИЗМЕНЕНИЙ, КАК БЫЛО */
+.message-text pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+    overflow-x: auto;
+    background: var(--bg-primary);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin: 8px 0;
+    font-family: 'Menlo', 'Monaco', monospace;
+    font-size: 14px;
+}
+
+.message-text code {
+    word-break: break-all;
+    white-space: pre-wrap;
+    font-family: 'Menlo', 'Monaco', monospace;
+    font-size: 14px;
+    background: var(--bg-primary);
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.message-text code:not(pre code) {
+    word-break: break-word;
+    display: inline;
+    white-space: normal;
+}
+
+/* Поле ввода */
 .input-container {
     position: fixed;
     bottom: 0;
@@ -191,9 +245,9 @@ body {
     opacity: 0.7;
 }
 
-/* КНОПКА - ПРОСТО БЕЛАЯ СТРЕЛКА */
+/* Кнопка */
 .send-btn {
-    background: transparent;  /* Прозрачный фон */
+    background: transparent;
     border: none;
     border-radius: 50%;
     width: 48px;
@@ -205,11 +259,11 @@ body {
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
-    opacity: 0.5;  /* Полупрозрачная когда нет текста */
+    opacity: 0.5;
 }
 
 .send-btn.active {
-    opacity: 1;  /* Яркая когда есть текст */
+    opacity: 1;
 }
 
 .send-btn:hover {
@@ -229,7 +283,7 @@ body {
 .send-btn svg {
     width: 20px;
     height: 20px;
-    stroke: white;  /* Белая стрелка */
+    stroke: white;
     stroke-width: 2;
 }
 
@@ -266,21 +320,21 @@ body {
     30% { transform: translateY(-8px); opacity: 1; }
 }
 
-/* МОБИЛЬНАЯ АДАПТАЦИЯ */
+/* Мобильная адаптация */
 @media (max-width: 600px) {
     .logo-header {
         top: 16px;
         left: 16px;
-        padding: 6px 14px;
+        gap: 10px;
     }
 
-    .logo-small {
-        width: 24px;
-        height: 24px;
+    .logo-image {
+        width: 32px;
+        height: 32px;
     }
 
     .logo-name {
-        font-size: 15px;
+        font-size: 18px;
     }
 
     .welcome-title {
@@ -311,7 +365,13 @@ body {
     }
 
     .message {
-        padding: 20px 16px;
+        padding: 6px 16px;
+    }
+
+    .message.user .message-content,
+    .message.assistant .message-content {
+        padding: 6px 14px;
+        max-width: 90%;
     }
 
     .chat-area {
@@ -333,36 +393,10 @@ body {
         width: 40px;
         height: 40px;
     }
-}
 
-
-
-.logo-header {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 100;
-    padding: 8px 16px;
-    border-radius: 100px;
-    background: rgba(44, 48, 53, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border);
-}
-
-.logo-image {
-    width: 28px;
-    height: 28px;
-    border-radius: 10px;
-    object-fit: cover; /* Чтобы картинка не искажалась */
-}
-
-.logo-name {
-    font-weight: 600;
-    font-size: 16px;
-    color: white;
-    letter-spacing: -0.3px;
+    .message.user .message-content,
+    .message.assistant .message-content {
+        max-width: 95%;
+        padding: 5px 12px;
+    }
 }
