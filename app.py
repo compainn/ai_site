@@ -12,7 +12,6 @@ app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 app.permanent_session_lifetime = timedelta(days=30)
 
-# Конфигурация
 OPENROUTER_API_KEY = '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'
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
