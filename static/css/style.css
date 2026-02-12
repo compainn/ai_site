@@ -349,3 +349,35 @@ body {
         height: 40px;
     }
 }
+
+
+
+.logo-header {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100;
+    padding: 8px 16px;
+    border-radius: 100px;
+    background: rgba(44, 48, 53, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+}
+
+.logo-image {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    object-fit: cover; /* Чтобы картинка не искажалась */
+}
+
+.logo-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    letter-spacing: -0.3px;
+}
