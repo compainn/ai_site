@@ -26,7 +26,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* Логотип - БОЛЬШЕ, ЖИРНЕЕ, БЕЗ РАМКИ */
+/* Логотип */
 .logo-header {
     position: fixed;
     top: 20px;
@@ -44,17 +44,48 @@ body {
 }
 
 .logo-image {
-    width: 40px;         /* 36 → 40 */
-    height: 40px;        /* 36 → 40 */
-    border-radius: 14px; /* 12 → 14 */
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
     object-fit: cover;
 }
 
 .logo-name {
-    font-weight: 700;    /* 600 → 700 (ЖИРНЕЕ) */
-    font-size: 22px;     /* 20 → 22 */
+    font-weight: 700;
+    font-size: 22px;
     color: white;
     letter-spacing: -0.3px;
+}
+
+/* Кнопка переключения темы */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: none;
+    padding: 0;
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--text-primary);
+    stroke-width: 2;
 }
 
 .container {
@@ -84,7 +115,7 @@ body {
     text-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
-/* Чат область - БЕЗ ГОРИЗОНТАЛЬНОГО СКРОЛЛА */
+/* Чат область */
 .chat-area {
     position: absolute;
     top: 80px;
@@ -92,7 +123,7 @@ body {
     right: 0;
     bottom: 100px;
     overflow-y: auto;
-    overflow-x: hidden;  /* УБИРАЕМ ГОРИЗОНТАЛЬНЫЙ ПОЛЗУНОК */
+    overflow-x: hidden;
     padding: 20px;
 }
 
@@ -141,7 +172,7 @@ body {
     color: white;
 }
 
-/* ПОЛЕ ВВОДА */
+/* Поле ввода */
 .input-container {
     position: fixed;
     bottom: 0;
@@ -193,7 +224,7 @@ body {
     opacity: 0.7;
 }
 
-/* КНОПКА */
+/* Кнопка отправки */
 .send-btn {
     background: transparent;
     border: none;
@@ -216,7 +247,6 @@ body {
 
 .send-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    opacity: 1;
 }
 
 .send-btn:active {
@@ -268,7 +298,48 @@ body {
     30% { transform: translateY(-8px); opacity: 1; }
 }
 
-/* МОБИЛЬНАЯ АДАПТАЦИЯ */
+/* ============ СВЕТЛАЯ ТЕМА ============ */
+body.light-theme {
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #e8e8e8;
+    --surface: #ffffff;
+    --surface-hover: #f0f0f0;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --border: #d1d1d1;
+    --border-focused: #999999;
+}
+
+body.light-theme .logo-name {
+    color: #1a1a1a;
+}
+
+body.light-theme .welcome-title {
+    color: #1a1a1a;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+body.light-theme .input-wrapper textarea {
+    color: #1a1a1a;
+}
+
+body.light-theme .send-btn svg {
+    stroke: #1a1a1a;
+}
+
+body.light-theme .send-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .message.user .message-text {
+    color: #1a1a1a;
+}
+
+body.light-theme .theme-toggle svg {
+    stroke: #1a1a1a;
+}
+
+/* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ============ */
 @media (max-width: 600px) {
     .logo-header {
         top: 16px;
@@ -277,13 +348,25 @@ body {
     }
 
     .logo-image {
-        width: 36px;     /* 32 → 36 */
-        height: 36px;    /* 32 → 36 */
+        width: 36px;
+        height: 36px;
     }
 
     .logo-name {
-        font-size: 20px; /* 18 → 20 */
+        font-size: 20px;
         font-weight: 700;
+    }
+
+    .theme-toggle {
+        top: 16px;
+        right: 16px;
+        width: 44px;
+        height: 44px;
+    }
+    
+    .theme-toggle svg {
+        width: 26px;
+        height: 26px;
     }
 
     .welcome-title {
@@ -335,101 +418,5 @@ body {
     .send-btn {
         width: 40px;
         height: 40px;
-    }
-}
-
-.theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
-    background: rgba(44, 48, 53, 0.8);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--text-primary);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: all 0.2s ease;
-    padding: 0;
-}
-
-.theme-toggle:hover {
-    background: var(--surface-hover);
-    border-color: var(--border-focused);
-    transform: scale(1.05);
-}
-
-.theme-toggle:active {
-    transform: scale(0.95);
-}
-
-.theme-toggle svg {
-    width: 22px;
-    height: 22px;
-    stroke: var(--text-primary);
-}
-
-/* ============ СВЕТЛАЯ ТЕМА ============ */
-body.light-theme {
-    --bg-primary: #f5f5f5;
-    --bg-secondary: #e8e8e8;
-    --surface: #ffffff;
-    --surface-hover: #f0f0f0;
-    --text-primary: #1a1a1a;
-    --text-secondary: #666666;
-    --border: #d1d1d1;
-    --border-focused: #999999;
-}
-
-body.light-theme .logo-name {
-    color: #1a1a1a;
-}
-
-body.light-theme .welcome-title {
-    color: #1a1a1a;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-body.light-theme .input-wrapper textarea {
-    color: #1a1a1a;
-}
-
-body.light-theme .send-btn svg {
-    stroke: #1a1a1a;
-}
-
-body.light-theme .message.user .message-text {
-    color: #1a1a1a;
-}
-
-/* Адаптация кнопки под светлую тему */
-body.light-theme .theme-toggle {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: var(--border);
-    color: var(--text-primary);
-}
-
-body.light-theme .theme-toggle:hover {
-    background: #ffffff;
-}
-
-/* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ДЛЯ КНОПКИ ============ */
-@media (max-width: 600px) {
-    .theme-toggle {
-        top: 16px;
-        right: 16px;
-        width: 40px;
-        height: 40px;
-    }
-    
-    .theme-toggle svg {
-        width: 20px;
-        height: 20px;
     }
 }
