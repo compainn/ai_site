@@ -26,7 +26,6 @@ class PulseAI {
             this.messageInput.style.height = 'auto';
             this.messageInput.style.height = this.messageInput.scrollHeight + 'px';
 
-            // Активируем кнопку если есть текст
             if (this.messageInput.value.trim().length > 0) {
                 this.sendBtn.classList.add('active');
             } else {
@@ -38,6 +37,9 @@ class PulseAI {
     async sendMessage() {
         const message = this.messageInput.value.trim();
         if (!message || this.isLoading) return;
+
+        // Убираем фокус с поля ввода, чтобы клавиатура спряталась
+        this.messageInput.blur();
 
         this.centerContent.style.opacity = '0';
         setTimeout(() => {
@@ -78,7 +80,7 @@ class PulseAI {
         } finally {
             this.isLoading = false;
             this.sendBtn.disabled = false;
-            this.messageInput.focus();
+            // УБРАЛИ this.messageInput.focus() - теперь клавиатура НЕ вылезает сама!
         }
     }
 
@@ -97,16 +99,17 @@ class PulseAI {
     }
 
     formatText(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    text = div.innerHTML;
+        const div = document.createElement('div');
+        div.textContent = text;
+        text = div.innerHTML;
 
-    text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-    text = text.replace(/\n/g, '<br>');
+        text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+        text = text.replace(/\n/g, '<br>');
 
-    return text;
-}
+        return text;
+    }
+
     showTypingIndicator() {
         const indicator = document.createElement('div');
         indicator.className = 'typing-indicator';
@@ -134,35 +137,23 @@ document.addEventListener('DOMContentLoaded', () => {
     new PulseAI();
 });
 
-
+// ============ ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ТЕМЫ ============
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const sunIcon = document.querySelector('.sun-icon');
     const moonIcon = document.querySelector('.moon-icon');
     const body = document.body;
 
-    // Проверяем, есть ли сохраненная тема в localStorage
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        body.classList.add('light-theme');
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-    }
-
-    // Обработчик клика по кнопке
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('light-theme');
             
-            // Переключаем иконки
             if (body.classList.contains('light-theme')) {
                 sunIcon.style.display = 'none';
                 moonIcon.style.display = 'block';
-                localStorage.setItem('theme', 'light');
             } else {
                 sunIcon.style.display = 'block';
                 moonIcon.style.display = 'none';
-                localStorage.setItem('theme', 'dark');
             }
         });
     }
