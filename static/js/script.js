@@ -133,3 +133,37 @@ class PulseAI {
 document.addEventListener('DOMContentLoaded', () => {
     new PulseAI();
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+    const body = document.body;
+
+    // Проверяем, есть ли сохраненная тема в localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        body.classList.add('light-theme');
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'block';
+    }
+
+    // Обработчик клика по кнопке
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-theme');
+            
+            // Переключаем иконки
+            if (body.classList.contains('light-theme')) {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+                localStorage.setItem('theme', 'light');
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    }
+});
