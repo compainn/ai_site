@@ -18,7 +18,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     height: 100vh;
@@ -30,7 +30,6 @@ body {
     user-select: text;
 }
 
-/* Простой логотип слева сверху */
 .simple-logo {
     position: fixed;
     top: 20px;
@@ -41,30 +40,30 @@ body {
     z-index: 100;
 }
 
-.logo-emoji {
-    font-size: 28px;
-    line-height: 1;
+.logo-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
 }
 
 .logo-text {
-    font-weight: 700;
-    font-size: 22px;
+    font-weight: 600;
+    font-size: 20px;
     color: var(--text-primary);
     letter-spacing: -0.3px;
 }
 
-/* Правая часть с кнопками */
 .right-buttons {
     position: fixed;
     top: 20px;
     right: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     z-index: 100;
 }
 
-/* Кнопка входа */
 .login-btn {
     display: flex;
     align-items: center;
@@ -91,7 +90,6 @@ body {
     height: 18px;
 }
 
-/* Информация о пользователе */
 .user-info {
     display: flex;
     align-items: center;
@@ -138,36 +136,6 @@ body {
     color: #dc3545;
 }
 
-/* Кнопка темы */
-.theme-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(44, 48, 53, 0.8);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    color: var(--text-primary);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: all 0.2s ease;
-}
-
-.theme-toggle:hover {
-    background: var(--surface-hover);
-    border-color: var(--border-focused);
-}
-
-.theme-toggle svg {
-    width: 22px;
-    height: 22px;
-    stroke: currentColor;
-    stroke-width: 2;
-}
-
-/* Бургер-меню */
 .burger-menu {
     background: none;
     border: none;
@@ -206,7 +174,6 @@ body {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Выдвижная панель */
 .menu-panel {
     position: fixed;
     top: 0;
@@ -233,7 +200,7 @@ body {
 }
 
 .menu-title {
-    font-weight: 700;
+    font-weight: 600;
     font-size: 20px;
     color: var(--text-primary);
 }
@@ -264,7 +231,6 @@ body {
     width: 100%;
 }
 
-/* Элементы меню */
 .menu-item {
     display: flex;
     align-items: center;
@@ -281,6 +247,11 @@ body {
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.menu-item:last-child {
+    margin-bottom: 0;
 }
 
 .menu-item:hover {
@@ -308,7 +279,6 @@ body {
     background: var(--border-focused);
 }
 
-/* Секция истории */
 .menu-section {
     margin-top: 8px;
 }
@@ -382,12 +352,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
     transition: all 0.2s ease;
-}
-
-.history-item:hover .delete-chat {
-    opacity: 1;
 }
 
 .delete-chat:hover {
@@ -407,7 +372,6 @@ body {
     font-size: 13px;
 }
 
-/* Оверлей */
 .menu-overlay {
     position: fixed;
     top: 0;
@@ -426,7 +390,6 @@ body {
     visibility: visible;
 }
 
-/* Основной контейнер */
 .container {
     height: 100vh;
     padding-top: 80px;
@@ -434,7 +397,6 @@ body {
     position: relative;
 }
 
-/* Центр экрана */
 .center-content {
     position: absolute;
     top: 50%;
@@ -453,7 +415,6 @@ body {
     letter-spacing: -1px;
 }
 
-/* Чат область */
 .chat-area {
     height: 100%;
     overflow-y: auto;
@@ -466,7 +427,6 @@ body {
     margin: 0 auto;
 }
 
-/* Сообщения */
 .message {
     display: flex;
     gap: 16px;
@@ -514,7 +474,6 @@ body {
     font-family: monospace;
 }
 
-/* Поле ввода */
 .input-container {
     position: fixed;
     bottom: 0;
@@ -550,7 +509,7 @@ body {
     border: none;
     outline: none;
     color: var(--text-primary);
-    font-family: 'Inter', sans-serif;
+    font-family: 'SF Pro Display', sans-serif;
     font-size: 16px;
     line-height: 1.5;
     max-height: 120px;
@@ -564,7 +523,6 @@ body {
     opacity: 0.7;
 }
 
-/* Кнопка отправки */
 .send-btn {
     background: transparent;
     border: none;
@@ -595,7 +553,6 @@ body {
     stroke-width: 2;
 }
 
-/* Индикатор печатания */
 .typing-indicator {
     display: flex;
     gap: 6px;
@@ -617,7 +574,6 @@ body {
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
-/* Анимации */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
@@ -628,7 +584,6 @@ body {
     30% { transform: translateY(-8px); opacity: 1; }
 }
 
-/* ============ СВЕТЛАЯ ТЕМА ============ */
 body.light-theme {
     --bg-primary: #f5f5f5;
     --bg-secondary: #e8e8e8;
@@ -662,19 +617,19 @@ body.light-theme .history-item.current {
     background: #e8e8e8;
 }
 
-/* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ============ */
 @media (max-width: 600px) {
     .simple-logo {
         top: 16px;
         left: 16px;
     }
 
-    .logo-emoji {
-        font-size: 24px;
+    .logo-image {
+        width: 36px; /* было 28 */
+        height: 36px; /* было 28 */
     }
 
     .logo-text {
-        font-size: 18px;
+        font-size: 22px; /* было 18 */
     }
 
     .right-buttons {
@@ -683,12 +638,12 @@ body.light-theme .history-item.current {
         gap: 6px;
     }
 
-    .login-btn span {
-        display: none;
-    }
-
     .login-btn {
         padding: 8px;
+    }
+
+    .login-btn span {
+        font-size: 13px;
     }
 
     .user-name-small {
@@ -697,11 +652,6 @@ body.light-theme .history-item.current {
 
     .user-info {
         padding: 2px;
-    }
-
-    .theme-toggle {
-        width: 36px;
-        height: 36px;
     }
 
     .burger-menu {
