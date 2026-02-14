@@ -647,7 +647,7 @@ body.light-theme .history-item.current {
     }
 
     .user-name-small {
-        display: none;
+        /* display: none; */
     }
 
     .user-info {
