@@ -282,7 +282,7 @@ body {
 
 .history-title {
     flex: 1;
-    font-size: 14px;
+    font-size: 17px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
