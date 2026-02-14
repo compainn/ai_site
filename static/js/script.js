@@ -35,11 +35,8 @@ class PulseAI {
         });
     }
 
-    // Загружаем сообщения текущего чата
-    async loadCurrentChatMessages() {
+    loadCurrentChatMessages() {
         try {
-            // Сообщения уже загружены в HTML с сервера
-            // Просто показываем чат если есть сообщения
             const messageElements = document.querySelectorAll('.message');
             if (messageElements.length > 0) {
                 this.centerContent.style.display = 'none';
@@ -86,16 +83,15 @@ class PulseAI {
 
             if (response.ok) {
                 this.addMessage(data.response, 'assistant');
-                // Обновляем историю чатов, если меню открыто
                 if (menuPanel && menuPanel.classList.contains('open')) {
                     loadChatHistory();
                 }
             } else {
-                this.addMessage('❌ Ошибка. Попробуй еще раз', 'assistant');
+                this.addMessage('Ошибка с моделью, администрация уже уведомлена', 'assistant');
             }
         } catch (error) {
             this.removeTypingIndicator();
-            this.addMessage('❌ Ошибка соединения', 'assistant');
+            this.addMessage('Ошибка соединения', 'assistant');
         } finally {
             this.isLoading = false;
             this.sendBtn.disabled = false;
@@ -151,9 +147,7 @@ class PulseAI {
     }
 }
 
-// ============ УВЕДОМЛЕНИЯ ============
 function showNotification(message, isError = false) {
-    // Удаляем старое уведомление если есть
     const oldNotification = document.querySelector('.notification');
     if (oldNotification) oldNotification.remove();
 
@@ -169,7 +163,6 @@ function showNotification(message, isError = false) {
     }, 3000);
 }
 
-// ============ ИСТОРИЯ ЧАТОВ ============
 async function loadChatHistory() {
     const historyList = document.getElementById('chatHistoryList');
     if (!historyList) return;
@@ -198,12 +191,10 @@ async function loadChatHistory() {
             </div>
         `).join('');
 
-        // Добавляем обработчики на элементы истории (кроме кнопки удаления)
         document.querySelectorAll('.history-item').forEach(item => {
             const chatId = item.dataset.chatId;
 
             item.addEventListener('click', async (e) => {
-                // Если кликнули на кнопку удаления - не загружаем чат
                 if (e.target.closest('.delete-chat')) return;
 
                 const response = await fetch(`/api/chat/${chatId}/load`, { method: 'POST' });
@@ -226,10 +217,8 @@ async function deleteChat(chatId, event) {
     try {
         const response = await fetch(`/api/chat/${chatId}/delete`, { method: 'POST' });
         if (response.ok) {
-            // Перезагружаем историю
             loadChatHistory();
 
-            // Если удалили текущий чат, перезагружаем страницу
             const currentItem = document.querySelector(`.history-item[data-chat-id="${chatId}"].current`);
             if (currentItem) {
                 window.location.reload();
@@ -248,8 +237,7 @@ async function createNewChat() {
         if (response.ok) {
             window.location.reload();
         } else if (response.status === 401) {
-            // Неавторизован
-            showNotification('🔐 Зарегистрируйтесь чтобы создавать чаты', true);
+            showNotification('Зарегистрируйтесь', true);
             closeMenuFunc();
         }
     } catch (e) {
@@ -257,19 +245,19 @@ async function createNewChat() {
     }
 }
 
-// ============ БУРГЕР-МЕНЮ ============
 const burgerMenu = document.getElementById('burgerMenu');
 const menuPanel = document.getElementById('menuPanel');
 const menuOverlay = document.getElementById('menuOverlay');
 const closeMenu = document.getElementById('closeMenu');
 const newChatBtn = document.getElementById('newChatBtn');
+const themeMenuItem = document.getElementById('themeMenuItem');
 
 function openMenu() {
     burgerMenu.classList.add('open');
     menuPanel.classList.add('open');
     menuOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
-    loadChatHistory(); // Загружаем историю при открытии
+    loadChatHistory();
 }
 
 function closeMenuFunc() {
@@ -281,9 +269,7 @@ function closeMenuFunc() {
 
 if (burgerMenu && menuPanel && menuOverlay) {
     burgerMenu.addEventListener('click', openMenu);
-
     closeMenu.addEventListener('click', closeMenuFunc);
-
     menuOverlay.addEventListener('click', closeMenuFunc);
 
     document.addEventListener('keydown', (e) => {
@@ -297,9 +283,7 @@ if (newChatBtn) {
     newChatBtn.addEventListener('click', createNewChat);
 }
 
-// ============ ПЕРЕКЛЮЧЕНИЕ ТЕМЫ ============
 document.addEventListener('DOMContentLoaded', () => {
-    const themeToggle = document.getElementById('theme-toggle');
     const sunIcon = document.querySelector('.sun-icon');
     const moonIcon = document.querySelector('.moon-icon');
     const body = document.body;
@@ -313,8 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
+    if (themeMenuItem) {
+        themeMenuItem.addEventListener('click', () => {
             body.classList.toggle('light-theme');
 
             if (body.classList.contains('light-theme')) {
@@ -334,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ============ ИНИЦИАЛИЗАЦИЯ ============
 document.addEventListener('DOMContentLoaded', () => {
     new PulseAI();
 });
