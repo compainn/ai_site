@@ -8,6 +8,7 @@ class PulseAI {
 
         this.isLoading = false;
         this.bindEvents();
+        this.loadCurrentChatMessages();
 
         setTimeout(() => this.messageInput.focus(), 100);
     }
@@ -34,11 +35,25 @@ class PulseAI {
         });
     }
 
+    // Загружаем сообщения текущего чата
+    async loadCurrentChatMessages() {
+        try {
+            // Сообщения уже загружены в HTML с сервера
+            // Просто показываем чат если есть сообщения
+            const messageElements = document.querySelectorAll('.message');
+            if (messageElements.length > 0) {
+                this.centerContent.style.display = 'none';
+                this.chatArea.style.display = 'block';
+            }
+        } catch (e) {
+            console.error('Error loading messages', e);
+        }
+    }
+
     async sendMessage() {
         const message = this.messageInput.value.trim();
         if (!message || this.isLoading) return;
 
-        // Убираем фокус с поля ввода, чтобы клавиатура спряталась
         this.messageInput.blur();
 
         this.centerContent.style.opacity = '0';
@@ -71,6 +86,10 @@ class PulseAI {
 
             if (response.ok) {
                 this.addMessage(data.response, 'assistant');
+                // Обновляем историю чатов, если меню открыто
+                if (menuPanel && menuPanel.classList.contains('open')) {
+                    loadChatHistory();
+                }
             } else {
                 this.addMessage('❌ Ошибка. Попробуй еще раз', 'assistant');
             }
@@ -80,7 +99,6 @@ class PulseAI {
         } finally {
             this.isLoading = false;
             this.sendBtn.disabled = false;
-            // УБРАЛИ this.messageInput.focus() - теперь клавиатура НЕ вылезает сама!
         }
     }
 
@@ -133,28 +151,190 @@ class PulseAI {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new PulseAI();
-});
+// ============ УВЕДОМЛЕНИЯ ============
+function showNotification(message, isError = false) {
+    // Удаляем старое уведомление если есть
+    const oldNotification = document.querySelector('.notification');
+    if (oldNotification) oldNotification.remove();
 
-// ============ ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ТЕМЫ ============
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.textContent = message;
+    notification.style.background = isError ? 'rgba(220, 53, 69, 0.9)' : 'var(--surface-hover)';
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// ============ ИСТОРИЯ ЧАТОВ ============
+async function loadChatHistory() {
+    const historyList = document.getElementById('chatHistoryList');
+    if (!historyList) return;
+
+    try {
+        const response = await fetch('/api/chats');
+        const chats = await response.json();
+
+        if (chats.length === 0) {
+            historyList.innerHTML = '<div class="history-empty">Нет сохраненных чатов</div>';
+            return;
+        }
+
+        historyList.innerHTML = chats.map(chat => `
+            <div class="history-item ${chat.is_current ? 'current' : ''}" data-chat-id="${chat.id}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 9l5 5 5-5M12 14V4"/>
+                </svg>
+                <span class="history-title">${chat.title}</span>
+                <span class="history-date">${new Date(chat.updated_at).toLocaleDateString()}</span>
+                <button class="delete-chat" onclick="deleteChat(${chat.id}, event)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        `).join('');
+
+        // Добавляем обработчики на элементы истории (кроме кнопки удаления)
+        document.querySelectorAll('.history-item').forEach(item => {
+            const chatId = item.dataset.chatId;
+
+            item.addEventListener('click', async (e) => {
+                // Если кликнули на кнопку удаления - не загружаем чат
+                if (e.target.closest('.delete-chat')) return;
+
+                const response = await fetch(`/api/chat/${chatId}/load`, { method: 'POST' });
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        });
+
+    } catch (e) {
+        console.error('Failed to load chat history', e);
+    }
+}
+
+async function deleteChat(chatId, event) {
+    event.stopPropagation();
+
+    if (!confirm('Удалить этот чат?')) return;
+
+    try {
+        const response = await fetch(`/api/chat/${chatId}/delete`, { method: 'POST' });
+        if (response.ok) {
+            // Перезагружаем историю
+            loadChatHistory();
+
+            // Если удалили текущий чат, перезагружаем страницу
+            const currentItem = document.querySelector(`.history-item[data-chat-id="${chatId}"].current`);
+            if (currentItem) {
+                window.location.reload();
+            }
+        }
+    } catch (e) {
+        console.error('Failed to delete chat', e);
+    }
+}
+
+async function createNewChat() {
+    try {
+        const response = await fetch('/api/chat/new', { method: 'POST' });
+        const data = await response.json();
+
+        if (response.ok) {
+            window.location.reload();
+        } else if (response.status === 401) {
+            // Неавторизован
+            showNotification('🔐 Зарегистрируйтесь чтобы создавать чаты', true);
+            closeMenuFunc();
+        }
+    } catch (e) {
+        console.error('Failed to create new chat', e);
+    }
+}
+
+// ============ БУРГЕР-МЕНЮ ============
+const burgerMenu = document.getElementById('burgerMenu');
+const menuPanel = document.getElementById('menuPanel');
+const menuOverlay = document.getElementById('menuOverlay');
+const closeMenu = document.getElementById('closeMenu');
+const newChatBtn = document.getElementById('newChatBtn');
+
+function openMenu() {
+    burgerMenu.classList.add('open');
+    menuPanel.classList.add('open');
+    menuOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    loadChatHistory(); // Загружаем историю при открытии
+}
+
+function closeMenuFunc() {
+    burgerMenu.classList.remove('open');
+    menuPanel.classList.remove('open');
+    menuOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+if (burgerMenu && menuPanel && menuOverlay) {
+    burgerMenu.addEventListener('click', openMenu);
+
+    closeMenu.addEventListener('click', closeMenuFunc);
+
+    menuOverlay.addEventListener('click', closeMenuFunc);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menuPanel.classList.contains('open')) {
+            closeMenuFunc();
+        }
+    });
+}
+
+if (newChatBtn) {
+    newChatBtn.addEventListener('click', createNewChat);
+}
+
+// ============ ПЕРЕКЛЮЧЕНИЕ ТЕМЫ ============
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const sunIcon = document.querySelector('.sun-icon');
     const moonIcon = document.querySelector('.moon-icon');
     const body = document.body;
 
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        body.classList.add('light-theme');
+        if (sunIcon && moonIcon) {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        }
+    }
+
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('light-theme');
-            
+
             if (body.classList.contains('light-theme')) {
-                sunIcon.style.display = 'none';
-                moonIcon.style.display = 'block';
+                if (sunIcon && moonIcon) {
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'block';
+                }
+                localStorage.setItem('theme', 'light');
             } else {
-                sunIcon.style.display = 'block';
-                moonIcon.style.display = 'none';
+                if (sunIcon && moonIcon) {
+                    sunIcon.style.display = 'block';
+                    moonIcon.style.display = 'none';
+                }
+                localStorage.setItem('theme', 'dark');
             }
         });
     }
+});
+
+// ============ ИНИЦИАЛИЗАЦИЯ ============
+document.addEventListener('DOMContentLoaded', () => {
+    new PulseAI();
 });
