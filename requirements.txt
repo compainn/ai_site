@@ -7,3 +7,4 @@ httpx==0.28.1
 SQLAlchemy==2.0.46
 gunicorn==23.0.0
 psycopg2-binary==2.9.9
+#тест
