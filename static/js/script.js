@@ -5,6 +5,7 @@ class PulseAI {
         this.messages = document.getElementById('messages');
         this.chatArea = document.getElementById('chatArea');
         this.centerContent = document.getElementById('centerContent');
+        this.newChatIcon = document.getElementById('newChatIcon');
 
         this.isLoading = false;
         this.bindEvents();
@@ -15,6 +16,10 @@ class PulseAI {
 
     bindEvents() {
         this.sendBtn.addEventListener('click', () => this.sendMessage());
+
+        if (this.newChatIcon) {
+            this.newChatIcon.addEventListener('click', () => this.createNewChat());
+        }
 
         this.messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -44,6 +49,19 @@ class PulseAI {
             }
         } catch (e) {
             console.error('Error loading messages', e);
+        }
+    }
+
+    async createNewChat() {
+        try {
+            const response = await fetch('/api/chat/new', { method: 'POST' });
+            if (response.ok) {
+                window.location.reload();
+            } else if (response.status === 401) {
+                showNotification('Зарегистрируйтесь', true);
+            }
+        } catch (e) {
+            console.error('Failed to create new chat', e);
         }
     }
 
@@ -155,6 +173,16 @@ function showNotification(message, isError = false) {
     notification.className = 'notification';
     notification.textContent = message;
     notification.style.background = isError ? 'rgba(220, 53, 69, 0.9)' : 'var(--surface-hover)';
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.padding = '12px 24px';
+    notification.style.borderRadius = '30px';
+    notification.style.zIndex = '2000';
+    notification.style.fontSize = '14px';
+    notification.style.fontWeight = '500';
+    notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
 
     document.body.appendChild(notification);
 
@@ -178,11 +206,7 @@ async function loadChatHistory() {
 
         historyList.innerHTML = chats.map(chat => `
             <div class="history-item ${chat.is_current ? 'current' : ''}" data-chat-id="${chat.id}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 9l5 5 5-5M12 14V4"/>
-                </svg>
                 <span class="history-title">${chat.title}</span>
-                <span class="history-date">${new Date(chat.updated_at).toLocaleDateString()}</span>
                 <button class="delete-chat" onclick="deleteChat(${chat.id}, event)">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12"/>
@@ -229,28 +253,12 @@ async function deleteChat(chatId, event) {
     }
 }
 
-async function createNewChat() {
-    try {
-        const response = await fetch('/api/chat/new', { method: 'POST' });
-        const data = await response.json();
-
-        if (response.ok) {
-            window.location.reload();
-        } else if (response.status === 401) {
-            showNotification('Зарегистрируйтесь', true);
-            closeMenuFunc();
-        }
-    } catch (e) {
-        console.error('Failed to create new chat', e);
-    }
-}
-
 const burgerMenu = document.getElementById('burgerMenu');
 const menuPanel = document.getElementById('menuPanel');
 const menuOverlay = document.getElementById('menuOverlay');
 const closeMenu = document.getElementById('closeMenu');
-const newChatBtn = document.getElementById('newChatBtn');
-const themeMenuItem = document.getElementById('themeMenuItem');
+const themeMenuLink = document.getElementById('themeMenuLink');
+const logoutFromMenu = document.getElementById('logoutFromMenu');
 
 function openMenu() {
     burgerMenu.classList.add('open');
@@ -269,7 +277,7 @@ function closeMenuFunc() {
 
 if (burgerMenu && menuPanel && menuOverlay) {
     burgerMenu.addEventListener('click', openMenu);
-    closeMenu.addEventListener('click', closeMenuFunc);
+    if (closeMenu) closeMenu.addEventListener('click', closeMenuFunc);
     menuOverlay.addEventListener('click', closeMenuFunc);
 
     document.addEventListener('keydown', (e) => {
@@ -279,8 +287,10 @@ if (burgerMenu && menuPanel && menuOverlay) {
     });
 }
 
-if (newChatBtn) {
-    newChatBtn.addEventListener('click', createNewChat);
+if (logoutFromMenu) {
+    logoutFromMenu.addEventListener('click', () => {
+        window.location.href = '/logout';
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -297,8 +307,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    if (themeMenuItem) {
-        themeMenuItem.addEventListener('click', () => {
+    if (themeMenuLink) {
+        themeMenuLink.addEventListener('click', () => {
             body.classList.toggle('light-theme');
 
             if (body.classList.contains('light-theme')) {
