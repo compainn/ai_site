@@ -62,8 +62,8 @@ class Message(db.Model):
 # ============================================
 
 # Google OAuth Configuration
-app.config['GOOGLE_CLIENT_ID'] = '263568169592-gk4d2goarom10j7n5iql7imsm0inisl1.apps.googleusercontent.com'
-app.config['GOOGLE_CLIENT_SECRET'] = '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'
+app.config['GOOGLE_CLIENT_ID'] = '263568169592-0a49h298c3e9v7k5shqaksiun6b937hm.apps.googleusercontent.com'
+app.config['GOOGLE_CLIENT_SECRET'] = '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'
 
 oauth = OAuth(app)
 
@@ -495,4 +495,4 @@ if __name__ == '__main__':
     import os
 
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=True)
