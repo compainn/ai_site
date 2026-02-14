@@ -295,13 +295,13 @@ body {
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    padding: 4px;
+    padding: 6px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 .delete-chat:hover {
@@ -311,8 +311,8 @@ body {
 }
 
 .delete-chat svg {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
 }
 
 .history-empty {
@@ -478,6 +478,21 @@ body {
     word-break: break-word;
 }
 
+.message-text pre {
+    background: var(--bg-primary);
+    padding: 12px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 8px 0;
+}
+
+.message-text code {
+    background: var(--bg-primary);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: monospace;
+}
+
 .input-container {
     position: fixed;
     bottom: 0;
@@ -531,8 +546,8 @@ body {
     background: var(--accent-blue);
     border: none;
     border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -553,8 +568,8 @@ body {
 }
 
 .send-btn svg {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     stroke: white;
     stroke-width: 3;
 }
@@ -594,38 +609,94 @@ body.light-theme {
     --bg-primary: #f5f5f5;
     --bg-secondary: #e8e8e8;
     --surface: #ffffff;
-    --surface-hover: #f0f0f0;
+    --surface-hover: #e0e0e0;
     --text-primary: #1a1a1a;
     --text-secondary: #666666;
-    --border: #d1d1d1;
+    --border: #cccccc;
     --border-focused: #999999;
     --accent-blue: #4a9eff;
+}
+
+body.light-theme .menu-panel {
+    background: #f0f0f0;
+    border-left: 1px solid #dddddd;
+}
+
+body.light-theme .menu-item-gpt {
+    color: #1a1a1a;
+}
+
+body.light-theme .menu-item-gpt:hover {
+    background: #e0e0e0;
+}
+
+body.light-theme .menu-item-gpt svg {
+    stroke: #1a1a1a;
+    fill: #1a1a1a;
+}
+
+body.light-theme .history-title {
+    color: #1a1a1a;
+}
+
+body.light-theme .history-item:hover {
+    background: #e0e0e0;
+}
+
+body.light-theme .menu-section-title {
+    color: #666666;
+}
+
+body.light-theme .delete-chat svg {
+    stroke: #666666;
+}
+
+body.light-theme .delete-chat:hover svg {
+    stroke: #dc3545;
 }
 
 body.light-theme .login-btn {
     background: #ffffff;
     color: #1a1a1a;
-    border-color: #d1d1d1;
+    border: 1px solid #cccccc;
 }
 
 body.light-theme .login-btn:hover {
     background: #f0f0f0;
 }
 
-body.light-theme .send-btn {
-    background: var(--accent-blue);
+body.light-theme .new-chat-icon {
+    color: #1a1a1a;
 }
 
-body.light-theme .send-btn:hover {
-    background: #3a7bc8;
+body.light-theme .new-chat-icon:hover {
+    background: #e0e0e0;
+}
+
+body.light-theme .burger-menu span {
+    background: #1a1a1a;
+}
+
+body.light-theme .send-btn {
+    background: var(--accent-blue);
 }
 
 body.light-theme .send-btn svg {
     stroke: white;
 }
 
-body.light-theme .burger-menu span {
-    background: #1a1a1a;
+body.light-theme .user-name-menu,
+body.light-theme .user-email-menu,
+body.light-theme .profile-logout {
+    color: #1a1a1a;
+}
+
+body.light-theme .menu-footer {
+    border-top: 1px solid #dddddd;
+}
+
+body.light-theme .menu-divider-light {
+    background: #dddddd;
 }
 
 @media (max-width: 600px) {
