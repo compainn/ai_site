@@ -7,14 +7,15 @@
 }
 
 :root {
-    --bg-primary: #3d3d3d;
-    --bg-secondary: #22262b;
-    --surface: #2c3035;
-    --surface-hover: #353a40;
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #222222;
+    --surface: #2a2a2a;
+    --surface-hover: #333333;
     --text-primary: #ffffff;
-    --text-secondary: #b0b8c5;
-    --border: #3a4048;
-    --border-focused: #5f6a7a;
+    --text-secondary: #a0a0a0;
+    --border: #3a3a3a;
+    --border-focused: #5a5a5a;
+    --accent-blue: #4a9eff;
 }
 
 body {
@@ -32,7 +33,7 @@ body {
 
 .simple-logo {
     position: fixed;
-    top: 20px;
+    top: 16px;
     left: 20px;
     display: flex;
     align-items: center;
@@ -48,7 +49,7 @@ body {
 }
 
 .logo-text {
-    font-weight: 600;
+    font-weight: 500;
     font-size: 20px;
     color: var(--text-primary);
     letter-spacing: -0.3px;
@@ -56,12 +57,34 @@ body {
 
 .right-buttons {
     position: fixed;
-    top: 20px;
+    top: 16px;
     right: 20px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     z-index: 100;
+}
+
+.new-chat-icon {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.new-chat-icon:hover {
+    background: var(--surface-hover);
+}
+
+.new-chat-icon svg {
+    width: 22px;
+    height: 22px;
 }
 
 .login-btn {
@@ -88,52 +111,6 @@ body {
 .login-btn svg {
     width: 18px;
     height: 18px;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 8px 4px 4px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 30px;
-    height: 40px;
-}
-
-.user-avatar-small {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.user-name-small {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
-    max-width: 100px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.logout-btn-small {
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.logout-btn-small:hover {
-    background: rgba(220, 53, 69, 0.2);
-    color: #dc3545;
 }
 
 .burger-menu {
@@ -180,12 +157,14 @@ body {
     right: -320px;
     width: 300px;
     height: 100vh;
-    background: var(--bg-primary);
+    background: #0a0a0a;
     border-left: 1px solid var(--border);
     z-index: 1000;
     transition: right 0.3s ease-in-out;
-    padding: 20px;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+    padding: 0;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
 }
 
 .menu-panel.open {
@@ -196,7 +175,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    padding: 20px 20px 0 20px;
+    margin-bottom: 8px;
 }
 
 .menu-title {
@@ -224,70 +204,54 @@ body {
     background: var(--surface-hover);
 }
 
-.menu-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 16px 0;
-    width: 100%;
+.menu-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px;
 }
 
-.menu-item {
+.menu-item-gpt {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 16px;
-    border-radius: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
     color: var(--text-primary);
     text-decoration: none;
-    transition: all 0.2s ease;
-    background: var(--surface);
-    border: none;
-    width: 100%;
-    text-align: left;
+    transition: background 0.2s ease;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 6px;
+    font-size: 15px;
+    font-weight: 400;
+    margin-bottom: 2px;
 }
 
-.menu-item:last-child {
-    margin-bottom: 0;
-}
-
-.menu-item:hover {
+.menu-item-gpt:hover {
     background: var(--surface-hover);
-    transform: translateX(-5px);
 }
 
-.menu-item svg {
+.menu-item-gpt svg {
     width: 20px;
     height: 20px;
-    fill: currentColor;
     stroke: currentColor;
+    fill: none;
 }
 
-.menu-item span {
+.menu-item-gpt span {
     flex: 1;
 }
 
-.new-chat-btn {
-    background: var(--surface-hover);
-    border: 1px solid var(--border-focused);
-}
-
-.new-chat-btn:hover {
-    background: var(--border-focused);
-}
-
-.menu-section {
-    margin-top: 8px;
+.menu-divider-light {
+    height: 1px;
+    background: var(--border);
+    margin: 12px 0;
+    width: 100%;
 }
 
 .menu-section-title {
     font-size: 12px;
     text-transform: uppercase;
     color: var(--text-secondary);
-    padding: 0 4px 8px 4px;
+    padding: 12px 16px 4px 16px;
     letter-spacing: 0.5px;
 }
 
@@ -300,46 +264,30 @@ body {
 .history-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    justify-content: space-between;
+    padding: 12px 16px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease;
     border-radius: 8px;
-    background: var(--surface);
-    margin-bottom: 4px;
-    position: relative;
+    margin-bottom: 2px;
 }
 
 .history-item:hover {
     background: var(--surface-hover);
-    transform: translateX(-5px);
 }
 
 .history-item.current {
     background: var(--surface-hover);
-    border-left: 3px solid var(--border-focused);
-}
-
-.history-item svg {
-    width: 16px;
-    height: 16px;
-    color: var(--text-secondary);
-    flex-shrink: 0;
 }
 
 .history-title {
     flex: 1;
-    font-size: 13px;
+    font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--text-primary);
-}
-
-.history-date {
-    font-size: 10px;
-    color: var(--text-secondary);
-    margin-right: 4px;
+    padding-right: 8px;
 }
 
 .delete-chat {
@@ -353,11 +301,13 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    opacity: 0.5;
 }
 
 .delete-chat:hover {
     color: #dc3545;
     background: rgba(220, 53, 69, 0.1);
+    opacity: 1;
 }
 
 .delete-chat svg {
@@ -366,10 +316,79 @@ body {
 }
 
 .history-empty {
-    padding: 20px;
+    padding: 16px;
     text-align: center;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 14px;
+}
+
+.menu-footer {
+    padding: 16px 20px 24px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.user-profile-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+}
+
+.user-avatar-menu {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info-menu {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-name-menu {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.user-email-menu {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.profile-logout {
+    color: var(--text-secondary);
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.profile-logout:hover {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.login-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 15px;
+}
+
+.login-menu-btn:hover {
+    color: var(--accent-blue);
+}
+
+.login-menu-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
 }
 
 .menu-overlay {
@@ -392,7 +411,7 @@ body {
 
 .container {
     height: 100vh;
-    padding-top: 80px;
+    padding-top: 70px;
     padding-bottom: 100px;
     position: relative;
 }
@@ -430,7 +449,7 @@ body {
 .message {
     display: flex;
     gap: 16px;
-    padding: 20px;
+    padding: 16px 0;
     animation: fadeIn 0.3s ease;
 }
 
@@ -457,21 +476,6 @@ body {
     line-height: 1.6;
     color: var(--text-primary);
     word-break: break-word;
-}
-
-.message-text pre {
-    background: var(--bg-primary);
-    padding: 12px;
-    border-radius: 12px;
-    overflow-x: auto;
-    margin: 8px 0;
-}
-
-.message-text code {
-    background: var(--bg-primary);
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-family: monospace;
 }
 
 .input-container {
@@ -524,7 +528,7 @@ body {
 }
 
 .send-btn {
-    background: transparent;
+    background: var(--accent-blue);
     border: none;
     border-radius: 50%;
     width: 48px;
@@ -536,6 +540,7 @@ body {
     transition: all 0.2s ease;
     flex-shrink: 0;
     opacity: 0.5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .send-btn.active {
@@ -543,14 +548,15 @@ body {
 }
 
 .send-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #3a7bc8;
+    transform: scale(1.05);
 }
 
 .send-btn svg {
-    width: 20px;
-    height: 20px;
-    stroke: var(--text-primary);
-    stroke-width: 2;
+    width: 24px;
+    height: 24px;
+    stroke: white;
+    stroke-width: 3;
 }
 
 .typing-indicator {
@@ -593,6 +599,7 @@ body.light-theme {
     --text-secondary: #666666;
     --border: #d1d1d1;
     --border-focused: #999999;
+    --accent-blue: #4a9eff;
 }
 
 body.light-theme .login-btn {
@@ -605,53 +612,46 @@ body.light-theme .login-btn:hover {
     background: #f0f0f0;
 }
 
+body.light-theme .send-btn {
+    background: var(--accent-blue);
+}
+
+body.light-theme .send-btn:hover {
+    background: #3a7bc8;
+}
+
 body.light-theme .send-btn svg {
-    stroke: #1a1a1a;
+    stroke: white;
 }
 
 body.light-theme .burger-menu span {
     background: #1a1a1a;
 }
 
-body.light-theme .history-item.current {
-    background: #e8e8e8;
-}
-
 @media (max-width: 600px) {
     .simple-logo {
-        top: 16px;
+        top: 12px;
         left: 16px;
     }
 
     .logo-image {
-        width: 36px; /* было 28 */
-        height: 36px; /* было 28 */
+        width: 32px;
+        height: 32px;
     }
 
     .logo-text {
-        font-size: 22px; /* было 18 */
+        font-size: 20px;
     }
 
     .right-buttons {
-        top: 16px;
+        top: 12px;
         right: 16px;
-        gap: 6px;
+        gap: 8px;
     }
 
-    .login-btn {
-        padding: 8px;
-    }
-
-    .login-btn span {
-        font-size: 13px;
-    }
-
-    .user-name-small {
-        /* display: none; */
-    }
-
-    .user-info {
-        padding: 2px;
+    .new-chat-icon svg {
+        width: 20px;
+        height: 20px;
     }
 
     .burger-menu {
@@ -668,7 +668,7 @@ body.light-theme .history-item.current {
     }
 
     .message {
-        padding: 16px 12px;
+        padding: 12px 0;
     }
 
     .message-text {
