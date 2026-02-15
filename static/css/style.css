@@ -778,27 +778,16 @@ body.light-theme .login-menu-btn:hover {
     }
 
     .menu-footer {
-        padding: 16px 20px 80px 20px;
+        padding: 16px 20px 40px 20px;
     }
 
     .login-menu-btn {
-        margin-bottom: 30px;
-        padding: 14px 16px;
-        font-size: 16px;
-    }
-
-    .user-profile-menu {
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
 }
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .menu-footer {
-        padding-bottom: max(80px, env(safe-area-inset-bottom, 80px));
+        padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
     }
 }
-
-#themeMenuLink {
-    padding-left: 22px;
-}
-
