@@ -293,7 +293,6 @@ if (logoutFromMenu) {
     });
 }
 
-// Функция для смены иконок Telegram
 function updateTelegramIcons() {
     const isLight = document.body.classList.contains('light-theme');
     const icons = document.querySelectorAll('.tg-icon');
@@ -314,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sunIcon.style.display = 'none';
             moonIcon.style.display = 'block';
         }
-        updateTelegramIcons(); // Устанавливаем черные иконки для светлой темы
+        updateTelegramIcons();
     }
 
     if (themeMenuLink) {
@@ -335,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('theme', 'dark');
             }
 
-            updateTelegramIcons(); // Меняем иконки при смене темы
+            updateTelegramIcons();
         });
     }
 });
