@@ -778,16 +778,41 @@ body.light-theme .login-menu-btn:hover {
     }
 
     .menu-footer {
-        padding: 16px 20px 40px 20px;
+        padding: 16px 20px 20px 20px;  
     }
 
     .login-menu-btn {
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 }
 
+
+@media (max-width: 600px) and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
+    @supports (-webkit-appearance:none) and (not (overflow:-webkit-marquee)) and (not (-ms-accelerator:true)) {
+        .menu-footer {
+            padding-bottom: 80px !important;
+        }
+        .login-menu-btn {
+            margin-bottom: 30px !important;
+        }
+    }
+}
+
+
+@media (max-width: 600px) and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
+    @supports (not (-webkit-appearance:none)) and (not (overflow:-webkit-marquee)) {
+        .menu-footer {
+            padding-bottom: 80px !important;
+        }
+        .login-menu-btn {
+            margin-bottom: 30px !important;
+        }
+    }
+}
+
+
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .menu-footer {
-        padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
+        padding-bottom: max(80px, env(safe-area-inset-bottom, 80px));
     }
 }
