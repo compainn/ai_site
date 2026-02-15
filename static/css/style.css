@@ -760,3 +760,8 @@ body.light-theme .menu-divider-light {
 #themeMenuLink {
     padding-left: 22px;
 }
+
+
+ .menu-footer {
+        padding: 12px 16px;
+    }
