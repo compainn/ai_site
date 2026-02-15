@@ -208,7 +208,7 @@ async function loadChatHistory() {
             <div class="history-item ${chat.is_current ? 'current' : ''}" data-chat-id="${chat.id}">
                 <span class="history-title">${chat.title}</span>
                 <button class="delete-chat" onclick="deleteChat(${chat.id}, event)">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12"/>
                     </svg>
                 </button>
@@ -293,6 +293,15 @@ if (logoutFromMenu) {
     });
 }
 
+// Функция для смены иконок Telegram
+function updateTelegramIcons() {
+    const isLight = document.body.classList.contains('light-theme');
+    const icons = document.querySelectorAll('.tg-icon');
+    icons.forEach(icon => {
+        icon.src = isLight ? '/static/telegram-black.png' : '/static/telegram-white.png';
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const sunIcon = document.querySelector('.sun-icon');
     const moonIcon = document.querySelector('.moon-icon');
@@ -305,6 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sunIcon.style.display = 'none';
             moonIcon.style.display = 'block';
         }
+        updateTelegramIcons(); // Устанавливаем черные иконки для светлой темы
     }
 
     if (themeMenuLink) {
@@ -324,6 +334,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 localStorage.setItem('theme', 'dark');
             }
+
+            updateTelegramIcons(); // Меняем иконки при смене темы
         });
     }
 });
