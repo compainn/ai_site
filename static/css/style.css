@@ -329,10 +329,11 @@ body {
 }
 
 .menu-footer {
-    padding: 12px 20px;  
+    padding: 16px 20px;
     border-top: 1px solid var(--border);
-    background: #0a0a0a; 
-    margin-top: auto; 
+    background: #0a0a0a;
+    margin-top: auto;
+    flex-shrink: 0;
 }
 
 .user-profile-menu {
@@ -383,20 +384,26 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 0;
+    padding: 12px 16px;
+    background: var(--surface);
+    border-radius: 28px;
     color: var(--text-primary);
     text-decoration: none;
     font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border);
 }
 
 .login-menu-btn:hover {
-    color: var(--accent-blue);
+    background: var(--surface-hover);
+    border-color: var(--border-focused);
 }
 
-.login-menu-btn svg {
+.login-menu-btn img {
     width: 20px;
     height: 20px;
-    fill: currentColor;
+    object-fit: contain;
 }
 
 .menu-overlay {
@@ -700,11 +707,23 @@ body.light-theme .profile-logout {
 }
 
 body.light-theme .menu-footer {
+    background: #f0f0f0;
     border-top: 1px solid #dddddd;
 }
 
 body.light-theme .menu-divider-light {
     background: #dddddd;
+}
+
+body.light-theme .login-menu-btn {
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #dddddd;
+}
+
+body.light-theme .login-menu-btn:hover {
+    background: #e0e0e0;
+    border-color: #999999;
 }
 
 @media (max-width: 600px) {
@@ -742,7 +761,6 @@ body.light-theme .menu-divider-light {
         width: 280px;
     }
 
-
     .welcome-title {
         font-size: 24px;
     }
@@ -757,6 +775,10 @@ body.light-theme .menu-divider-light {
 
     .input-container {
         padding: 12px;
+    }
+
+    .menu-footer {
+        padding: 12px 16px;
     }
 }
 
