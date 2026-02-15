@@ -740,6 +740,10 @@ body.light-theme .menu-divider-light {
         width: 280px;
     }
 
+    .menu-footer {
+        padding: 12px 16px;
+    }
+
     .welcome-title {
         font-size: 24px;
     }
@@ -762,6 +766,3 @@ body.light-theme .menu-divider-light {
 }
 
 
- .menu-footer {
-        padding: 12px 16px;
-    }
