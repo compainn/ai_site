@@ -162,7 +162,7 @@ body {
     z-index: 1000;
     transition: right 0.3s ease-in-out;
     padding: 0;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: none;
     display: flex;
     flex-direction: column;
 }
@@ -635,6 +635,7 @@ body.light-theme {
 body.light-theme .menu-panel {
     background: #f0f0f0;
     border-left: 1px solid #dddddd;
+    box-shadow: none;
 }
 
 body.light-theme .menu-item-gpt {
@@ -727,7 +728,7 @@ body.light-theme .login-menu-btn:hover {
 }
 
 body.light-theme .menu-overlay {
-    background: transparent;/*rgba(0, 0, 0, 0.2);*/
+    background: transparent;
 }
 
 @media (max-width: 600px) {
