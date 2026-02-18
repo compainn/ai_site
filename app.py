@@ -66,7 +66,7 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'},
 )
 
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', 'бла бла бла ')
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 MODELS = [
