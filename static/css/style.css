@@ -726,6 +726,10 @@ body.light-theme .login-menu-btn:hover {
     border-color: #999999;
 }
 
+body.light-theme .menu-overlay {
+    background: transparent;/*rgba(0, 0, 0, 0.2);*/
+}
+
 @media (max-width: 600px) {
     .simple-logo {
         top: 12px;
@@ -778,41 +782,10 @@ body.light-theme .login-menu-btn:hover {
     }
 
     .menu-footer {
-        padding: 16px 20px 20px 20px;  
-    }
-
-    .login-menu-btn {
-        margin-bottom: 10px;
+        padding: 12px 16px;
     }
 }
 
-
-@media (max-width: 600px) and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
-    @supports (-webkit-appearance:none) and (not (overflow:-webkit-marquee)) and (not (-ms-accelerator:true)) {
-        .menu-footer {
-            padding-bottom: 80px !important;
-        }
-        .login-menu-btn {
-            margin-bottom: 30px !important;
-        }
-    }
-}
-
-
-@media (max-width: 600px) and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: .001dpcm) {
-    @supports (not (-webkit-appearance:none)) and (not (overflow:-webkit-marquee)) {
-        .menu-footer {
-            padding-bottom: 80px !important;
-        }
-        .login-menu-btn {
-            margin-bottom: 30px !important;
-        }
-    }
-}
-
-
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-    .menu-footer {
-        padding-bottom: max(80px, env(safe-area-inset-bottom, 80px));
-    }
+#themeMenuLink {
+    padding-left: 22px;
 }
