@@ -1,7 +1,5 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-from openai import AsyncOpenAI
-import asyncio
-from functools import wraps
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, Response
+from groq import Groq
 import re
 import uuid
 import secrets
@@ -104,10 +102,7 @@ SYSTEM_PROMPT = """Твоё имя — Pulse. Ты — AI-ассистент.
 6. Никогда не упоминай компанию, которая тебя создала
 7. Для форматирования используй Markdown"""
 MAX_CONTEXT_LENGTH = 100
-ai_client = AsyncOpenAI(
-    base_url=OPENROUTER_BASE_URL,
-    api_key=OPENROUTER_API_KEY,
-)
+sync_groq_client = Groq(api_key=GROQ_API_KEY)
 context_storage = {}
 def get_session_id():
     if 'session_id' not in session:
@@ -163,12 +158,6 @@ def clean_response(text):
         else:
             cleaned_lines.append(line)
     return '\n'.join(cleaned_lines).strip()
-def async_route(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        return asyncio.run(f(*args, **kwargs))
-    return wrapped
-
 def verify_telegram_auth(auth_data):
     check_hash = auth_data.pop('hash', None)
     if not check_hash:
@@ -430,142 +419,64 @@ def clear_context():
 @app.route('/chat', methods=['POST'])
 def chat():
     import json as _json
-    try:
-        data = request.json
-        message = data.get('message', '').strip()
-        if not message:
-            return jsonify({'error': 'empty'}), 400
-        session_id = get_session_id()
-        context = get_context(session_id)
-        context.append({"role": "user", "content": message})
+    data = request.json
+    message = (data.get('message') or '').strip()
+    if not message:
+        return jsonify({'error': 'empty'}), 400
 
-        saved_session = dict(session)
+    session_id = get_session_id()
+    context = get_context(session_id)
+    context.append({"role": "user", "content": message})
 
-        def generate():
-            import asyncio as _asyncio
-            loop = _asyncio.new_event_loop()
-            _asyncio.set_event_loop(loop)
-            full_answer = []
-            try:
-                async def run():
-                    stream = await ai_client.chat.completions.create(
-                        model=MODEL,
-                        messages=context,
-                        max_tokens=2000,
-                        temperature=0.6,
-                        stream=True,
-                    )
-                    async for chunk in stream:
-                        delta = chunk.choices[0].delta.content
-                        if delta:
-                            full_answer.append(delta)
-                            yield delta
-                async def collect():
-                    async for token in run():
-                        yield token
-                async def main():
-                    async for token in collect():
-                        full_answer_tokens.append(token)
-                full_answer_tokens = []
-                client2 = AsyncGroq(api_key=GROQ_API_KEY)
-                async def stream_all():
-                    s = await client2.chat.completions.create(
-                        model=MODEL, messages=context,
-                        max_tokens=2000, temperature=0.6, stream=True)
-                    async for chunk in s:
-                        d = chunk.choices[0].delta.content
-                        if d:
-                            full_answer.append(d)
-                loop.run_until_complete(stream_all())
-            except Exception as e:
-                import traceback; traceback.print_exc()
-                yield f"data: {_json.dumps({'error': str(e)})}\n\n"
-                return
-            finally:
-                loop.close()
+    saved_user = session.get('user')
+    saved_chat_id = session.get('current_chat_id')
 
-            answer = ''.join(full_answer)
-            clean_answer = clean_response(answer)
-            context.append({"role": "assistant", "content": answer})
-            trim_context(session_id)
+    def token_stream():
+        full = []
+        sync_client = sync_groq_client
+        try:
+            stream = sync_client.chat.completions.create(
+                model=MODEL,
+                messages=context,
+                max_tokens=2000,
+                temperature=0.6,
+                stream=True,
+            )
+            for chunk in stream:
+                token = chunk.choices[0].delta.content
+                if token:
+                    full.append(token)
+                    yield "data: " + _json.dumps({'token': token}) + "\n\n"
+        except Exception as e:
+            yield "data: " + _json.dumps({'error': str(e)}) + "\n\n"
+            return
 
-            with app.app_context():
-                if saved_session.get('user') and saved_session.get('current_chat_id'):
-                    db.session.add(Message(chat_id=saved_session['current_chat_id'], role='user', content=message))
-                    db.session.add(Message(chat_id=saved_session['current_chat_id'], role='assistant', content=clean_answer))
-                    chat_obj = Chat.query.get(saved_session['current_chat_id'])
-                    if chat_obj:
-                        if len(chat_obj.messages) == 2:
-                            chat_obj.title = message[:50] + ('...' if len(message) > 50 else '')
-                        chat_obj.updated_at = datetime.utcnow()
-                    db.session.commit()
+        answer = ''.join(full)
+        clean_answer = clean_response(answer)
+        context.append({"role": "assistant", "content": answer})
+        trim_context(session_id)
 
-            yield f"data: {_json.dumps({'response': clean_answer, 'done': True})}\n\n"
+        with app.app_context():
+            if saved_user and saved_chat_id:
+                db.session.add(Message(chat_id=saved_chat_id, role='user', content=message))
+                db.session.add(Message(chat_id=saved_chat_id, role='assistant', content=clean_answer))
+                chat_obj = Chat.query.get(saved_chat_id)
+                if chat_obj:
+                    if len(chat_obj.messages) == 2:
+                        chat_obj.title = message[:50] + ('...' if len(message) > 50 else '')
+                    chat_obj.updated_at = datetime.utcnow()
+                db.session.commit()
 
-        def token_stream():
-            import json as _j
-            import asyncio as _a
-            loop = _a.new_event_loop()
-            _a.set_event_loop(loop)
-            full = []
-            try:
-                client2 = AsyncGroq(api_key=GROQ_API_KEY)
-                async def run():
-                    s = await client2.chat.completions.create(
-                        model=MODEL, messages=context,
-                        max_tokens=2000, temperature=0.6, stream=True)
-                    async for chunk in s:
-                        d = chunk.choices[0].delta.content
-                        if d:
-                            full.append(d)
-                            yield d
-                async def collect():
-                    tokens = []
-                    async for t in run():
-                        tokens.append(t)
-                    return tokens
-                tokens = loop.run_until_complete(collect())
-            except Exception as e:
-                import traceback; traceback.print_exc()
-                yield f"data: {_j.dumps({'error': str(e)})}\n\n"
-                return
-            finally:
-                loop.close()
+        yield "data: " + _json.dumps({'done': True}) + "\n\n"
 
-            for t in tokens:
-                yield f"data: {_j.dumps({'token': t})}\n\n"
-
-            answer = ''.join(tokens)
-            clean_answer = clean_response(answer)
-            context.append({"role": "assistant", "content": answer})
-            trim_context(session_id)
-
-            with app.app_context():
-                if saved_session.get('user') and saved_session.get('current_chat_id'):
-                    db.session.add(Message(chat_id=saved_session['current_chat_id'], role='user', content=message))
-                    db.session.add(Message(chat_id=saved_session['current_chat_id'], role='assistant', content=clean_answer))
-                    chat_obj = Chat.query.get(saved_session['current_chat_id'])
-                    if chat_obj:
-                        if len(chat_obj.messages) == 2:
-                            chat_obj.title = message[:50] + ('...' if len(message) > 50 else '')
-                        chat_obj.updated_at = datetime.utcnow()
-                    db.session.commit()
-
-            yield f"data: {_j.dumps({'done': True})}\n\n"
-
-        return Response(token_stream(), mimetype='text/event-stream',
-                       headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
+    return Response(token_stream(), mimetype='text/event-stream',
+                    headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
 
 with app.app_context():
     try:
         db.create_all()
     except Exception as e:
         print(f"Ошибка при создании бдшки: {e}")
-
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 6790))
