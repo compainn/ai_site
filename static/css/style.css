@@ -33,79 +33,12 @@ body {
 
 .simple-logo {
     position: fixed;
-    top: 20px;
-    left: 24px;
+    top: 16px;
+    left: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
     z-index: 100;
-    cursor: pointer;
-    user-select: none;
-}
-
-.dropdown-arrow {
-    color: var(--text-secondary);
-    transition: transform 0.2s ease;
-    flex-shrink: 0;
-}
-
-.simple-logo.open .dropdown-arrow {
-    transform: rotate(180deg);
-}
-
-.model-dropdown {
-    display: none;
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 6px;
-    min-width: 220px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    z-index: 200;
-}
-
-.simple-logo.open .model-dropdown {
-    display: block;
-}
-
-.model-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.15s ease;
-}
-
-.model-option:hover {
-    background: var(--surface-hover);
-}
-
-.model-logo {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-.model-option-info {
-    flex: 1;
-}
-
-.model-option-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
-.model-check {
-    color: var(--accent-blue);
-    flex-shrink: 0;
 }
 
 .logo-image {
@@ -224,6 +157,7 @@ body {
     right: -320px;
     width: 300px;
     height: 100vh;
+    height: 100dvh;
     background: #0a0a0a;
     border-left: 1px solid var(--border);
     z-index: 1000;
@@ -323,7 +257,7 @@ body {
 }
 
 .chat-history-list {
-    max-height: 40vh;
+    max-height: 300px;
     overflow-y: auto;
     margin-bottom: 8px;
     scrollbar-width: none;
@@ -396,9 +330,10 @@ body {
 }
 
 .menu-footer {
-    padding: 12px 20px;
+    padding: 16px 20px;
     border-top: 1px solid var(--border);
     background: #0a0a0a;
+    margin-top: auto;
     flex-shrink: 0;
 }
 
@@ -593,6 +528,7 @@ body {
     left: 0;
     right: 0;
     padding: 20px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
     background: linear-gradient(to top, var(--bg-primary) 90%, transparent);
 }
 
@@ -917,101 +853,4 @@ body.light-theme .menu-overlay {
 .message.user .message-text {
     white-space: pre-wrap;
     font-family: inherit;
-}
-
-.step-block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin: 8px 0;
-    overflow: hidden;
-}
-.step-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    background: var(--surface-hover);
-    border-bottom: 1px solid var(--border);
-}
-.step-number {
-    background: var(--surface-hover);
-    color: var(--text-primary);
-    font-size: 12px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    border: 1px solid var(--border);
-}
-.step-title {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text-primary);
-}
-.step-body {
-    padding: 12px 16px;
-    font-size: 15px;
-    line-height: 1.6;
-}
-.answer-block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin: 8px 0;
-    overflow: hidden;
-}
-.answer-header {
-    padding: 10px 16px;
-    background: var(--surface-hover);
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border);
-}
-.answer-body {
-    padding: 12px 16px;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.6;
-}
-
-body.light-theme .model-dropdown {
-    background: #ffffff;
-    border-color: #dddddd;
-}
-body.light-theme .model-option:hover {
-    background: #e0e0e0;
-}
-body.light-theme .ai-logo-dropdown {
-    filter: invert(1);
-}
-.mic-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-
-.mic-btn:hover {
-    color: var(--text-primary);
-    background: var(--surface-hover);
-}
-
-.mic-btn.recording {
-    color: #ff4444;
-    animation: pulse-mic 1s infinite;
-}
-
-@keyframes pulse-mic {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
 }
