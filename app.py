@@ -1,7 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-from groq import AsyncGroq
-import asyncio
-from functools import wraps
+from groq import Groq
 import re
 import uuid
 import secrets
@@ -68,7 +66,7 @@ TELEGRAM_BOT_TOKEN = '8569563154:AAGnzJutAFQNUSpMlKQlSKv9MFaaCtRFyFw'
 GROQ_API_KEY = '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'
 MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
 
-ai_client = AsyncGroq(api_key=GROQ_API_KEY)
+groq_client = Groq(api_key=GROQ_API_KEY)
 
 SYSTEM_PROMPT = (
     "You are Pulse, a smart educational assistant for school and university students. "
@@ -132,12 +130,6 @@ def clean_response(text):
         s = line.lstrip()
         cleaned.append(s[2:] if s.startswith('- ') else line)
     return '\n'.join(cleaned).strip()
-
-def async_route(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        return asyncio.run(f(*args, **kwargs))
-    return wrapped
 
 def verify_telegram_auth(auth_data):
     check_hash = auth_data.pop('hash', None)
