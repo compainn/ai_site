@@ -5,14 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Pulse AI</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <link href="https://fonts.cdnfonts.com/css/sf-pro-display" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/static/logo.png">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <div class="simple-logo">
+    <div class="simple-logo" id="modelSelector">
         <img src="/static/logo.png" alt="Pulse" class="logo-image">
         <span class="logo-text">Pulse</span>
+        <svg class="dropdown-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <div class="model-dropdown" id="modelDropdown">
+            <div class="model-option active">
+                <img src="/static/ai_logo_white.png" alt="" class="model-logo ai-logo-dropdown">
+                <div class="model-option-info">
+                    <span class="model-option-name">Pulse Edge 1.2</span>
+                </div>
+                <svg class="model-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+        </div>
     </div>
-
     <div class="right-buttons">
         {% if user %}
             <button class="new-chat-icon" id="newChatIcon" title="Новый чат">
@@ -22,36 +32,30 @@
                 </svg>
             </button>
         {% else %}
-            <a href="/login/google" class="login-btn">
-                <img src="/static/google.png" alt="Google" style="width: 18px; height: 18px; object-fit: contain;">
+            <button class="login-btn" id="openLoginModal">
                 <span>Войти</span>
-            </a>
+            </button>
         {% endif %}
-
         <button id="burgerMenu" class="burger-menu">
             <span></span>
             <span></span>
             <span></span>
         </button>
     </div>
-
     <div class="menu-panel" id="menuPanel">
         <div class="menu-header">
             <span class="menu-title">Меню</span>
             <button class="close-menu" id="closeMenu">✕</button>
         </div>
-
         <div class="menu-list">
             <a href="https://t.me/qpuud" target="_blank" class="menu-item-gpt">
                 <img src="/static/telegram-white.png" alt="TG" class="tg-icon" id="tgIconChannel" style="width: 30px; height: 30px; object-fit: contain;">
                 <span>Telegram канал</span>
             </a>
-
-            <a href="https://t.me/pulseai_robot" target="_blank" class="menu-item-gpt">
-                <img src="/static/telegram-white.png" alt="TG" class="tg-icon" id="tgIconBot" style="width: 30px; height: 30px; object-fit: contain;">
-                <span>Telegram бот</span>
+            <a href="https://t.me/PulseSup_robot" target="_blank" class="menu-item-gpt">
+                <img src="/static/support_white.png" alt="Support" class="support-icon" id="supportIcon" style="width: 30px; height: 30px; object-fit: contain;">
+                <span>Support</span>
             </a>
-
             <div class="menu-item-gpt" id="themeMenuLink">
                 <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"/>
@@ -69,13 +73,10 @@
                 </svg>
                 <span>Сменить тему</span>
             </div>
-
             <div class="menu-divider-light"></div>
-
             <div class="menu-section-title">Ваши чаты</div>
             <div class="chat-history-list" id="chatHistoryList"></div>
         </div>
-
         {% if user %}
         <div class="menu-footer">
             <div class="user-profile-menu">
@@ -93,21 +94,17 @@
         </div>
         {% else %}
         <div class="menu-footer">
-            <a href="/login/google" class="login-menu-btn">
-                <img src="/static/google.png" alt="Google" style="width: 20px; height: 20px; object-fit: contain;">
-                <span>Войти с Google</span>
-            </a>
+            <button class="login-menu-btn" id="openLoginModalMenu">
+                <span>Войти</span>
+            </button>
         </div>
         {% endif %}
     </div>
-
     <div class="menu-overlay" id="menuOverlay"></div>
-
     <div class="container">
         <div class="center-content" id="centerContent" {% if messages %}style="display: none;"{% endif %}>
             <h1 class="welcome-title">Чем могу помочь?</h1>
         </div>
-
         <div class="chat-area" id="chatArea" {% if not messages %}style="display: none;"{% endif %}>
             <div class="messages" id="messages">
                 {% if messages %}
@@ -122,7 +119,6 @@
             </div>
         </div>
     </div>
-
     <div class="input-container">
         <div class="input-wrapper">
             <textarea
@@ -130,6 +126,14 @@
                 placeholder="Спроси Pulse..."
                 rows="1"
             ></textarea>
+            <button class="mic-btn" id="micBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+            </button>
             <button class="send-btn" id="sendBtn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                     <path d="M12 19V5M5 12l7-7 7 7" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
@@ -137,7 +141,39 @@
             </button>
         </div>
     </div>
-
+    <div id="loginModal" class="login-modal" style="display: none;">
+        <h2>Войти</h2>
+        <a href="/login/google" class="login-option">
+            <img src="/static/google.png" alt="Google">
+            <span>Google</span>
+        </a>
+        <div class="login-option" id="telegram-login-option">
+            <img src="/static/telegram-white.png" alt="Telegram" class="tg-icon">
+            <span>Telegram</span>
+        </div>
+        <div id="telegram-widget-modal" style="display: none; margin-top: 10px;"></div>
+    </div>
     <script src="/static/js/script.js"></script>
+    <script>
+        window.onTelegramAuth = async function(user) {
+            try {
+                const response = await fetch('/api/auth/telegram', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(user)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Authentication failed');
+                }
+            } catch (error) {
+                alert('Error during authentication');
+            }
+        };
+    </script>
 </body>
 </html>
