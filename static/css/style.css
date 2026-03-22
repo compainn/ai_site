@@ -397,9 +397,11 @@ body {
 
 .menu-footer {
     padding: 12px 20px;
-    border-top: 1px solid var(--border);
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    border-top: none;
     background: #0a0a0a;
     flex-shrink: 0;
+    margin-bottom: 120px;
 }
 
 .user-profile-menu {
@@ -787,8 +789,12 @@ body.light-theme .profile-logout {
 }
 
 body.light-theme .menu-footer {
-    background: #f0f0f0;
-    border-top: 1px solid #dddddd;
+    padding: 12px 20px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    border-top: none;
+    background: #0a0a0a;
+    flex-shrink: 0;
+    margin-bottom: 120px;
 }
 
 body.light-theme .menu-divider-light {
@@ -862,8 +868,13 @@ body.light-theme .menu-overlay {
     }
 
     .menu-footer {
-        padding: 12px 16px;
-    }
+    padding: 12px 20px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    border-top: none;
+    background: #0a0a0a;
+    flex-shrink: 0;
+    margin-bottom: 120px;
+}
 }
 
 #themeMenuLink {
