@@ -2,18 +2,14 @@ class PulseAI {
     constructor() {
         this.messageInput = document.getElementById('messageInput');
         this.sendBtn = document.getElementById('sendBtn');
-        this.micBtn = document.getElementById('micBtn');
         this.messages = document.getElementById('messages');
         this.chatArea = document.getElementById('chatArea');
         this.centerContent = document.getElementById('centerContent');
         this.newChatIcon = document.getElementById('newChatIcon');
-        this.isRecording = false;
-        this.recognition = null;
 
         this.isLoading = false;
         this.bindEvents();
         this.loadCurrentChatMessages();
-        this.initSpeech();
 
         setTimeout(() => this.messageInput.focus(), 100);
     }
@@ -42,56 +38,6 @@ class PulseAI {
                 this.sendBtn.classList.remove('active');
             }
         });
-
-        if (this.micBtn) {
-            this.micBtn.addEventListener('click', () => this.toggleRecording());
-        }
-    }
-
-    initSpeech() {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) return;
-
-        this.recognition = new SpeechRecognition();
-        this.recognition.lang = 'ru-RU';
-        this.recognition.continuous = false;
-        this.recognition.interimResults = false;
-
-        this.recognition.onresult = (e) => {
-            const transcript = e.results[0][0].transcript;
-            this.messageInput.value = transcript;
-            this.messageInput.style.height = 'auto';
-            this.messageInput.style.height = this.messageInput.scrollHeight + 'px';
-            this.sendBtn.classList.add('active');
-            this.stopRecording();
-        };
-
-        this.recognition.onerror = () => this.stopRecording();
-        this.recognition.onend = () => this.stopRecording();
-    }
-
-    toggleRecording() {
-        if (!this.recognition) {
-            showNotification('Микрофон не поддерживается в этом браузере', true);
-            return;
-        }
-        if (this.isRecording) {
-            this.stopRecording();
-        } else {
-            this.startRecording();
-        }
-    }
-
-    startRecording() {
-        this.isRecording = true;
-        this.micBtn.classList.add('recording');
-        this.recognition.start();
-    }
-
-    stopRecording() {
-        this.isRecording = false;
-        if (this.micBtn) this.micBtn.classList.remove('recording');
-        try { this.recognition.stop(); } catch(e) {}
     }
 
     loadCurrentChatMessages() {
@@ -149,17 +95,49 @@ class PulseAI {
                 body: JSON.stringify({ message })
             });
 
-            const data = await response.json();
+            if (!response.ok) {
+                this.removeTypingIndicator();
+                this.addMessage('Ошибка с моделью, администрация уже уведомлена', 'assistant');
+                return;
+            }
 
             this.removeTypingIndicator();
 
-            if (response.ok) {
-                this.addMessage(data.response, 'assistant');
-                if (menuPanel && menuPanel.classList.contains('open')) {
-                    loadChatHistory();
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            messageDiv.innerHTML = '<div class="message-content"><div class="message-text"></div></div>';
+            this.messages.appendChild(messageDiv);
+            const textEl = messageDiv.querySelector('.message-text');
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let fullText = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('
+');
+                buffer = lines.pop();
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const parsed = JSON.parse(line.slice(6));
+                            if (parsed.token) {
+                                fullText += parsed.token;
+                                textEl.innerHTML = this.formatText(fullText);
+                                this.scrollToBottom();
+                            }
+                            if (parsed.done) {
+                                if (menuPanel && menuPanel.classList.contains('open')) {
+                                    loadChatHistory();
+                                }
+                            }
+                        } catch(e) {}
+                    }
                 }
-            } else {
-                this.addMessage('Ошибка с моделью, администрация уже уведомлена', 'assistant');
             }
         } catch (error) {
             this.removeTypingIndicator();
@@ -177,10 +155,10 @@ class PulseAI {
         let htmlText;
     
         if (role === 'assistant') {
-            htmlText = this.formatText(text);
+            htmlText = marked.parse(text);
         } else {
             const tempDiv = document.createElement('div');
-            tempDiv.textContent = text;
+            tempDiv.textContent = text; 
             htmlText = tempDiv.innerHTML;
         }
     
@@ -198,32 +176,6 @@ class PulseAI {
         const div = document.createElement('div');
         div.textContent = text;
         text = div.innerHTML;
-
-        const hasSteps = /\[STEP\s*\d+:/i.test(text) || /\[ANSWER\]/i.test(text) ||
-                         /\[ШАГ\s*\d+:/i.test(text) || /\[ОТВЕТ\]/i.test(text);
-
-        if (hasSteps) {
-            const parts = text.split(/(\[(?:STEP|ШАГ)\s*\d+:[^\]]+\]|\[(?:ANSWER|ОТВЕТ)\])/i);
-            let result = '';
-            let openBlock = false;
-            parts.forEach((part) => {
-                const stepMatch = part.match(/\[(?:STEP|ШАГ)\s*(\d+):\s*([^\]]+)\]/i);
-                const answerMatch = part.match(/\[(?:ANSWER|ОТВЕТ)\]/i);
-                if (stepMatch) {
-                    if (openBlock) result += '</div></div>';
-                    result += '<div class="step-block"><div class="step-header"><span class="step-number">Шаг ' + stepMatch[1] + '</span><span class="step-title">' + stepMatch[2].trim() + '</span></div><div class="step-body">';
-                    openBlock = true;
-                } else if (answerMatch) {
-                    if (openBlock) result += '</div></div>';
-                    result += '<div class="answer-block"><div class="answer-header">&#10003; Ответ</div><div class="answer-body">';
-                    openBlock = true;
-                } else {
-                    result += part;
-                }
-            });
-            if (openBlock) result += '</div></div>';
-            text = result;
-        }
 
         text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
         text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -385,17 +337,9 @@ if (logoutFromMenu) {
 
 function updateTelegramIcons() {
     const isLight = document.body.classList.contains('light-theme');
-    const tgIcons = document.querySelectorAll('.tg-icon');
-    tgIcons.forEach(icon => {
+    const icons = document.querySelectorAll('.tg-icon');
+    icons.forEach(icon => {
         icon.src = isLight ? '/static/telegram-black.png' : '/static/telegram-white.png';
-    });
-    const supportIcon = document.getElementById('supportIcon');
-    if (supportIcon) {
-        supportIcon.src = isLight ? '/static/support_black.png' : '/static/support_white.png';
-    }
-    const aiLogos = document.querySelectorAll('.ai-logo-dropdown');
-    aiLogos.forEach(logo => {
-        logo.src = isLight ? '/static/ai_logo_black.png' : '/static/ai_logo_white.png';
     });
 }
 
@@ -495,18 +439,4 @@ telegramLoginOption.addEventListener('click', () => {
     waitForElement('#telegram-widget-modal iframe', (iframe) => {
         iframe.click();
     });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const modelSelector = document.getElementById('modelSelector');
-    const modelDropdown = document.getElementById('modelDropdown');
-    if (modelSelector) {
-        modelSelector.addEventListener('click', (e) => {
-            e.stopPropagation();
-            modelSelector.classList.toggle('open');
-        });
-        document.addEventListener('click', () => {
-            modelSelector.classList.remove('open');
-        });
-    }
 });
