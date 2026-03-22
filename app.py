@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, Response
-from groq import Groq
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from groq import AsyncGroq
+import asyncio
+from functools import wraps
 import re
 import uuid
 import secrets
-import json
 from datetime import datetime, timedelta
 import os
 from authlib.integrations.flask_client import OAuth
@@ -19,7 +20,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:/
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -32,7 +32,6 @@ class User(db.Model):
     chats = db.relationship('Chat', backref='user', lazy=True, cascade='all, delete-orphan',
                             order_by='desc(Chat.updated_at)')
 
-
 class Chat(db.Model):
     __tablename__ = 'chats'
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +42,6 @@ class Chat(db.Model):
     messages = db.relationship('Message', backref='chat', lazy=True, order_by='Message.created_at',
                                cascade='all, delete-orphan')
 
-
 class Message(db.Model):
     __tablename__ = 'messages'
     id = db.Column(db.Integer, primary_key=True)
@@ -52,10 +50,8 @@ class Message(db.Model):
     content = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-
 app.config['GOOGLE_CLIENT_ID'] = '392453659452-mbmjcs902ojveis5vh9csjlb462ofriv.apps.googleusercontent.com'
 app.config['GOOGLE_CLIENT_SECRET'] = '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'
-
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -72,7 +68,7 @@ TELEGRAM_BOT_TOKEN = '8569563154:AAGnzJutAFQNUSpMlKQlSKv9MFaaCtRFyFw'
 GROQ_API_KEY = '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'
 MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
 
-groq_client = Groq(api_key=GROQ_API_KEY)
+ai_client = AsyncGroq(api_key=GROQ_API_KEY)
 
 SYSTEM_PROMPT = (
     "You are Pulse, a smart educational assistant for school and university students. "
@@ -96,24 +92,20 @@ SYSTEM_PROMPT = (
 MAX_CONTEXT_LENGTH = 100
 context_storage = {}
 
-
 def get_session_id():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
     return session['session_id']
-
 
 def get_context(session_id):
     if session_id not in context_storage:
         context_storage[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
     return context_storage[session_id]
 
-
 def trim_context(session_id):
     context = context_storage[session_id]
     if len(context) > MAX_CONTEXT_LENGTH:
         context_storage[session_id] = [context[0]] + context[-(MAX_CONTEXT_LENGTH - 1):]
-
 
 def clean_response(text):
     if not text:
@@ -141,6 +133,11 @@ def clean_response(text):
         cleaned.append(s[2:] if s.startswith('- ') else line)
     return '\n'.join(cleaned).strip()
 
+def async_route(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        return asyncio.run(f(*args, **kwargs))
+    return wrapped
 
 def verify_telegram_auth(auth_data):
     check_hash = auth_data.pop('hash', None)
@@ -159,7 +156,6 @@ def verify_telegram_auth(auth_data):
     if time.time() - auth_date > 86400:
         return False
     return True
-
 
 @app.route('/api/auth/telegram', methods=['POST'])
 def telegram_auth():
@@ -212,12 +208,10 @@ def telegram_auth():
         traceback.print_exc()
         return jsonify({"success": False, "error": "Authentication failed"}), 500
 
-
 @app.route('/login/google')
 def google_login():
     redirect_uri = url_for('google_callback', _external=True)
     return google.authorize_redirect(redirect_uri)
-
 
 @app.route('/callback/google')
 def google_callback():
@@ -245,13 +239,11 @@ def google_callback():
         traceback.print_exc()
     return redirect(url_for('index'))
 
-
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     session.pop('current_chat_id', None)
     return redirect(url_for('index'))
-
 
 @app.route('/api/chats')
 def get_chats():
@@ -264,7 +256,6 @@ def get_chats():
         'message_count': len(c.messages), 'is_current': c.id == session.get('current_chat_id')
     } for c in chats])
 
-
 @app.route('/api/chat/<int:chat_id>')
 def get_chat(chat_id):
     if not session.get('user'):
@@ -273,7 +264,6 @@ def get_chat(chat_id):
     if not chat:
         return jsonify({'error': 'Not found'}), 404
     return jsonify([{'role': m.role, 'content': m.content, 'created_at': m.created_at.isoformat()} for m in chat.messages])
-
 
 @app.route('/api/chat/<int:chat_id>/load', methods=['POST'])
 def load_chat(chat_id):
@@ -285,11 +275,7 @@ def load_chat(chat_id):
     session['current_chat_id'] = chat.id
     msgs = [{"role": m.role, "content": m.content} for m in chat.messages]
     context_storage[get_session_id()] = [{"role": "system", "content": SYSTEM_PROMPT}] + msgs
-    return jsonify({
-        'success': True,
-        'messages': [{'role': m.role, 'content': m.content, 'created_at': m.created_at.isoformat()} for m in chat.messages]
-    })
-
+    return jsonify({'success': True, 'messages': [{'role': m.role, 'content': m.content, 'created_at': m.created_at.isoformat()} for m in chat.messages]})
 
 @app.route('/api/chat/new', methods=['POST'])
 def new_chat():
@@ -301,7 +287,6 @@ def new_chat():
     session['current_chat_id'] = nc.id
     context_storage[get_session_id()] = [{"role": "system", "content": SYSTEM_PROMPT}]
     return jsonify({'success': True, 'chat_id': nc.id, 'title': nc.title})
-
 
 @app.route('/api/chat/<int:chat_id>/delete', methods=['POST'])
 def delete_chat(chat_id):
@@ -320,7 +305,6 @@ def delete_chat(chat_id):
         context_storage[get_session_id()] = [{"role": "system", "content": SYSTEM_PROMPT}]
     return jsonify({'success': True})
 
-
 @app.route('/')
 def index():
     session_id = get_session_id()
@@ -338,7 +322,6 @@ def index():
             user_dict['email'] = 'Telegram'
     return render_template('index.html', user=session.get('user'), messages=messages_data)
 
-
 @app.route('/clear', methods=['POST'])
 def clear_context():
     if session.get('user') and session.get('current_chat_id'):
@@ -346,7 +329,6 @@ def clear_context():
         db.session.commit()
     context_storage[get_session_id()] = [{"role": "system", "content": SYSTEM_PROMPT}]
     return jsonify({'status': 'success'})
-
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -359,61 +341,43 @@ def chat():
     context = get_context(session_id)
     context.append({"role": "user", "content": message})
 
-    saved_user = session.get('user')
-    saved_chat_id = session.get('current_chat_id')
-
-    def token_stream():
-        full = []
-        try:
-            stream = groq_client.chat.completions.create(
-                model=MODEL,
-                messages=context,
-                max_tokens=2000,
-                temperature=0.6,
-                stream=True,
-            )
-            for chunk in stream:
-                token = chunk.choices[0].delta.content
-                if token:
-                    full.append(token)
-                    yield "data: " + json.dumps({'token': token}) + "\n\n"
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            yield "data: " + json.dumps({'error': str(e)}) + "\n\n"
-            return
-
-        answer = ''.join(full)
+    try:
+        response = groq_client.chat.completions.create(
+            model=MODEL,
+            messages=context,
+            max_tokens=2000,
+            temperature=0.6,
+        )
+        answer = response.choices[0].message.content
         clean_answer = clean_response(answer)
+
         context.append({"role": "assistant", "content": answer})
         trim_context(session_id)
 
-        with app.app_context():
-            if saved_user and saved_chat_id:
-                db.session.add(Message(chat_id=saved_chat_id, role='user', content=message))
-                db.session.add(Message(chat_id=saved_chat_id, role='assistant', content=clean_answer))
-                chat_obj = Chat.query.get(saved_chat_id)
-                if chat_obj:
-                    if len(chat_obj.messages) == 2:
-                        chat_obj.title = message[:50] + ('...' if len(message) > 50 else '')
-                    chat_obj.updated_at = datetime.utcnow()
-                db.session.commit()
+        if session.get('user') and session.get('current_chat_id'):
+            db.session.add(Message(chat_id=session['current_chat_id'], role='user', content=message))
+            db.session.add(Message(chat_id=session['current_chat_id'], role='assistant', content=clean_answer))
+            chat_obj = Chat.query.get(session['current_chat_id'])
+            if chat_obj:
+                if len(chat_obj.messages) == 2:
+                    chat_obj.title = message[:50] + ('...' if len(message) > 50 else '')
+                chat_obj.updated_at = datetime.utcnow()
+            db.session.commit()
 
-        yield "data: " + json.dumps({'done': True}) + "\n\n"
+        return jsonify({'response': clean_answer, 'status': 'success'})
 
-    return Response(
-        token_stream(),
-        mimetype='text/event-stream',
-        headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'}
-    )
-
+    except Exception as e:
+        if context and context[-1]["role"] == "user":
+            context.pop()
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 with app.app_context():
     try:
         db.create_all()
     except Exception as e:
         print('DB error:', e)
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 6790))
