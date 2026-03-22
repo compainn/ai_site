@@ -397,9 +397,11 @@ body {
 
 .menu-footer {
     padding: 12px 20px;
-    border-top: 1px solid var(--border);
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    border-top: none;
     background: #0a0a0a;
     flex-shrink: 0;
+    margin-bottom: 120px;
 }
 
 .user-profile-menu {
@@ -788,7 +790,7 @@ body.light-theme .profile-logout {
 
 body.light-theme .menu-footer {
     background: #f0f0f0;
-    border-top: 1px solid #dddddd;
+    border-top: none;
 }
 
 body.light-theme .menu-divider-light {
@@ -984,7 +986,7 @@ body.light-theme .model-option:hover {
     background: #e0e0e0;
 }
 body.light-theme .ai-logo-dropdown {
-    filter: invert(1);
+    filter: invert(1) !important;
 }
 .mic-btn {
     background: none;
