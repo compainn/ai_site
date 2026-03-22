@@ -2,14 +2,18 @@ class PulseAI {
     constructor() {
         this.messageInput = document.getElementById('messageInput');
         this.sendBtn = document.getElementById('sendBtn');
+        this.micBtn = document.getElementById('micBtn');
         this.messages = document.getElementById('messages');
         this.chatArea = document.getElementById('chatArea');
         this.centerContent = document.getElementById('centerContent');
         this.newChatIcon = document.getElementById('newChatIcon');
+        this.isRecording = false;
+        this.recognition = null;
 
         this.isLoading = false;
         this.bindEvents();
         this.loadCurrentChatMessages();
+        this.initSpeech();
 
         setTimeout(() => this.messageInput.focus(), 100);
     }
@@ -38,6 +42,56 @@ class PulseAI {
                 this.sendBtn.classList.remove('active');
             }
         });
+
+        if (this.micBtn) {
+            this.micBtn.addEventListener('click', () => this.toggleRecording());
+        }
+    }
+
+    initSpeech() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return;
+
+        this.recognition = new SpeechRecognition();
+        this.recognition.lang = 'ru-RU';
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+
+        this.recognition.onresult = (e) => {
+            const transcript = e.results[0][0].transcript;
+            this.messageInput.value = transcript;
+            this.messageInput.style.height = 'auto';
+            this.messageInput.style.height = this.messageInput.scrollHeight + 'px';
+            this.sendBtn.classList.add('active');
+            this.stopRecording();
+        };
+
+        this.recognition.onerror = () => this.stopRecording();
+        this.recognition.onend = () => this.stopRecording();
+    }
+
+    toggleRecording() {
+        if (!this.recognition) {
+            showNotification('Микрофон не поддерживается в этом браузере', true);
+            return;
+        }
+        if (this.isRecording) {
+            this.stopRecording();
+        } else {
+            this.startRecording();
+        }
+    }
+
+    startRecording() {
+        this.isRecording = true;
+        this.micBtn.classList.add('recording');
+        this.recognition.start();
+    }
+
+    stopRecording() {
+        this.isRecording = false;
+        if (this.micBtn) this.micBtn.classList.remove('recording');
+        try { this.recognition.stop(); } catch(e) {}
     }
 
     loadCurrentChatMessages() {
@@ -119,13 +173,23 @@ class PulseAI {
     addMessage(text, role) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${role}`;
-
+    
+        let htmlText;
+    
+        if (role === 'assistant') {
+            htmlText = this.formatText(text);
+        } else {
+            const tempDiv = document.createElement('div');
+            tempDiv.textContent = text;
+            htmlText = tempDiv.innerHTML;
+        }
+    
         messageDiv.innerHTML = `
             <div class="message-content">
-                <div class="message-text">${this.formatText(text)}</div>
+                <div class="message-text">${htmlText}</div>
             </div>
         `;
-
+    
         this.messages.appendChild(messageDiv);
         this.scrollToBottom();
     }
@@ -134,6 +198,32 @@ class PulseAI {
         const div = document.createElement('div');
         div.textContent = text;
         text = div.innerHTML;
+
+        const hasSteps = /\[STEP\s*\d+:/i.test(text) || /\[ANSWER\]/i.test(text) ||
+                         /\[ШАГ\s*\d+:/i.test(text) || /\[ОТВЕТ\]/i.test(text);
+
+        if (hasSteps) {
+            const parts = text.split(/(\[(?:STEP|ШАГ)\s*\d+:[^\]]+\]|\[(?:ANSWER|ОТВЕТ)\])/i);
+            let result = '';
+            let openBlock = false;
+            parts.forEach((part) => {
+                const stepMatch = part.match(/\[(?:STEP|ШАГ)\s*(\d+):\s*([^\]]+)\]/i);
+                const answerMatch = part.match(/\[(?:ANSWER|ОТВЕТ)\]/i);
+                if (stepMatch) {
+                    if (openBlock) result += '</div></div>';
+                    result += '<div class="step-block"><div class="step-header"><span class="step-number">Шаг ' + stepMatch[1] + '</span><span class="step-title">' + stepMatch[2].trim() + '</span></div><div class="step-body">';
+                    openBlock = true;
+                } else if (answerMatch) {
+                    if (openBlock) result += '</div></div>';
+                    result += '<div class="answer-block"><div class="answer-header">&#10003; Ответ</div><div class="answer-body">';
+                    openBlock = true;
+                } else {
+                    result += part;
+                }
+            });
+            if (openBlock) result += '</div></div>';
+            text = result;
+        }
 
         text = text.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
         text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -295,9 +385,17 @@ if (logoutFromMenu) {
 
 function updateTelegramIcons() {
     const isLight = document.body.classList.contains('light-theme');
-    const icons = document.querySelectorAll('.tg-icon');
-    icons.forEach(icon => {
+    const tgIcons = document.querySelectorAll('.tg-icon');
+    tgIcons.forEach(icon => {
         icon.src = isLight ? '/static/telegram-black.png' : '/static/telegram-white.png';
+    });
+    const supportIcon = document.getElementById('supportIcon');
+    if (supportIcon) {
+        supportIcon.src = isLight ? '/static/support_black.png' : '/static/support_white.png';
+    }
+    const aiLogos = document.querySelectorAll('.ai-logo-dropdown');
+    aiLogos.forEach(logo => {
+        logo.src = isLight ? '/static/ai_logo_black.png' : '/static/ai_logo_white.png';
     });
 }
 
@@ -341,4 +439,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     new PulseAI();
+});
+
+const openLoginModal = document.getElementById('openLoginModal');
+const openLoginModalMenu = document.getElementById('openLoginModalMenu');
+const loginModal = document.getElementById('loginModal');
+const telegramLoginOption = document.getElementById('telegram-login-option');
+
+function showLoginModal() {
+    loginModal.style.display = 'block';
+    menuOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLoginModal() {
+    loginModal.style.display = 'none';
+    menuOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+if (openLoginModal) {
+    openLoginModal.addEventListener('click', showLoginModal);
+}
+
+if (openLoginModalMenu) {
+    openLoginModalMenu.addEventListener('click', showLoginModal);
+}
+
+menuOverlay.addEventListener('click', closeLoginModal);
+
+function waitForElement(selector, callback) {
+    const observer = new MutationObserver(() => {
+        const element = document.querySelector(selector);
+        if (element) {
+            observer.disconnect();
+            callback(element);
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+telegramLoginOption.addEventListener('click', () => {
+    const widgetContainer = document.getElementById('telegram-widget-modal');
+    widgetContainer.style.display = 'block';
+    widgetContainer.innerHTML = '';
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.setAttribute('data-telegram-login', "pulseai_robot");
+    script.setAttribute('data-size', "large");
+    script.setAttribute('data-userpic', "false");
+    script.setAttribute('data-onauth', "onTelegramAuth(user)");
+    script.setAttribute('data-request-access', "write");
+    widgetContainer.appendChild(script);
+    waitForElement('#telegram-widget-modal iframe', (iframe) => {
+        iframe.click();
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modelSelector = document.getElementById('modelSelector');
+    const modelDropdown = document.getElementById('modelDropdown');
+    if (modelSelector) {
+        modelSelector.addEventListener('click', (e) => {
+            e.stopPropagation();
+            modelSelector.classList.toggle('open');
+        });
+        document.addEventListener('click', () => {
+            modelSelector.classList.remove('open');
+        });
+    }
 });
