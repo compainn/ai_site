@@ -12,6 +12,7 @@ import hashlib
 import time
 
 app = Flask(__name__)
+
 app.secret_key = secrets.token_hex(16)
 app.permanent_session_lifetime = timedelta(days=30)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///pulse.db')
