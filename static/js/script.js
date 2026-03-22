@@ -154,7 +154,7 @@ class PulseAI {
             this.removeTypingIndicator();
 
             if (response.ok) {
-                await this.typeMessage(data.response);
+                this.addMessage(data.response, 'assistant');
                 if (menuPanel && menuPanel.classList.contains('open')) {
                     loadChatHistory();
                 }
@@ -173,9 +173,9 @@ class PulseAI {
     addMessage(text, role) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${role}`;
-
+    
         let htmlText;
-
+    
         if (role === 'assistant') {
             htmlText = this.formatText(text);
         } else {
@@ -183,35 +183,14 @@ class PulseAI {
             tempDiv.textContent = text;
             htmlText = tempDiv.innerHTML;
         }
-
+    
         messageDiv.innerHTML = `
             <div class="message-content">
                 <div class="message-text">${htmlText}</div>
             </div>
         `;
-
+    
         this.messages.appendChild(messageDiv);
-        this.scrollToBottom();
-    }
-
-    async typeMessage(text) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message assistant';
-        messageDiv.innerHTML = '<div class="message-content"><div class="message-text"></div></div>';
-        this.messages.appendChild(messageDiv);
-        const textEl = messageDiv.querySelector('.message-text');
-
-        let displayed = '';
-        const delay = text.length > 300 ? 8 : 14;
-
-        for (let i = 0; i < text.length; i++) {
-            displayed += text[i];
-            textEl.innerHTML = this.formatText(displayed);
-            this.scrollToBottom();
-            await new Promise(r => setTimeout(r, delay));
-        }
-
-        textEl.innerHTML = this.formatText(text);
         this.scrollToBottom();
     }
 
@@ -432,8 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
             sunIcon.style.display = 'none';
             moonIcon.style.display = 'block';
         }
-        updateTelegramIcons();
     }
+    updateTelegramIcons();
 
     if (themeMenuLink) {
         themeMenuLink.addEventListener('click', () => {
