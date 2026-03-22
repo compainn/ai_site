@@ -983,6 +983,9 @@ body.light-theme .model-dropdown {
 body.light-theme .model-option:hover {
     background: #e0e0e0;
 }
+body.light-theme .ai-logo-dropdown {
+    filter: invert(1);
+}
 .mic-btn {
     background: none;
     border: none;
