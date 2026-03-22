@@ -149,47 +149,17 @@ class PulseAI {
                 body: JSON.stringify({ message })
             });
 
-            if (!response.ok) {
-                this.removeTypingIndicator();
-                this.addMessage('Ошибка с моделью, администрация уже уведомлена', 'assistant');
-                return;
-            }
+            const data = await response.json();
 
             this.removeTypingIndicator();
 
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message assistant';
-            msgDiv.innerHTML = '<div class="message-content"><div class="message-text"></div></div>';
-            this.messages.appendChild(msgDiv);
-            const textEl = msgDiv.querySelector('.message-text');
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            let fullText = '';
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop();
-                for (const line of lines) {
-                    if (!line.startsWith('data: ')) continue;
-                    try {
-                        const parsed = JSON.parse(line.slice(6));
-                        if (parsed.token) {
-                            fullText += parsed.token;
-                            textEl.innerHTML = this.formatText(fullText);
-                            this.scrollToBottom();
-                        }
-                        if (parsed.done) {
-                            if (menuPanel && menuPanel.classList.contains('open')) {
-                                loadChatHistory();
-                            }
-                        }
-                    } catch (e) {}
+            if (response.ok) {
+                await this.typeMessage(data.response);
+                if (menuPanel && menuPanel.classList.contains('open')) {
+                    loadChatHistory();
                 }
+            } else {
+                this.addMessage('Ошибка с моделью, администрация уже уведомлена', 'assistant');
             }
         } catch (error) {
             this.removeTypingIndicator();
@@ -203,9 +173,9 @@ class PulseAI {
     addMessage(text, role) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${role}`;
-    
+
         let htmlText;
-    
+
         if (role === 'assistant') {
             htmlText = this.formatText(text);
         } else {
@@ -213,14 +183,35 @@ class PulseAI {
             tempDiv.textContent = text;
             htmlText = tempDiv.innerHTML;
         }
-    
+
         messageDiv.innerHTML = `
             <div class="message-content">
                 <div class="message-text">${htmlText}</div>
             </div>
         `;
-    
+
         this.messages.appendChild(messageDiv);
+        this.scrollToBottom();
+    }
+
+    async typeMessage(text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message assistant';
+        messageDiv.innerHTML = '<div class="message-content"><div class="message-text"></div></div>';
+        this.messages.appendChild(messageDiv);
+        const textEl = messageDiv.querySelector('.message-text');
+
+        let displayed = '';
+        const delay = text.length > 300 ? 8 : 14;
+
+        for (let i = 0; i < text.length; i++) {
+            displayed += text[i];
+            textEl.innerHTML = this.formatText(displayed);
+            this.scrollToBottom();
+            await new Promise(r => setTimeout(r, delay));
+        }
+
+        textEl.innerHTML = this.formatText(text);
         this.scrollToBottom();
     }
 
