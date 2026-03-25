@@ -379,6 +379,19 @@ function openMenu() {
     loadChatHistory();
 }
 
+
+#проверка
+
+function updateAILogo() {
+    const isLight = document.body.classList.contains('light-theme');
+    const aiLogo = document.getElementById('aiLogoDropdown');
+    if (aiLogo) {
+        aiLogo.src = isLight ? '/static/ai_logo_black.png' : '/static/ai_logo_white.png';
+        console.log('Лого обновлен:', aiLogo.src);
+    }
+}    
+
+
 function closeMenuFunc() {
     burgerMenu.classList.remove('open');
     menuPanel.classList.remove('open');
@@ -403,6 +416,10 @@ if (logoutFromMenu) {
         window.location.href = '/logout';
     });
 }
+
+
+
+
 
 function updateTelegramIcons() {
     const isLight = document.body.classList.contains('light-theme');
@@ -434,6 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     updateTelegramIcons();
+    updateAILogo(); // <-- ТЕСТ ФУНКЦИЯ
 
     if (themeMenuLink) {
         themeMenuLink.addEventListener('click', () => {
