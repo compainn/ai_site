@@ -404,10 +404,6 @@ if (logoutFromMenu) {
     });
 }
 
-
-
-
-
 function updateTelegramIcons() {
     const isLight = document.body.classList.contains('light-theme');
     const tgIcons = document.querySelectorAll('.tg-icon');
@@ -418,10 +414,10 @@ function updateTelegramIcons() {
     if (supportIcon) {
         supportIcon.src = isLight ? '/static/support_black.png' : '/static/support_white.png';
     }
-    const aiLogos = document.querySelectorAll('.ai-logo-dropdown');
-    aiLogos.forEach(logo => {
-        logo.src = isLight ? '/static/ai_logo_black.png' : '/static/ai_logo_white.png';
-    });
+    const aiLogo = document.getElementById('aiLogoDropdown');
+    if (aiLogo) {
+        aiLogo.src = isLight ? '/static/ai_logo_black.png' : '/static/ai_logo_white.png';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -438,7 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     updateTelegramIcons();
-
 
     if (themeMenuLink) {
         themeMenuLink.addEventListener('click', () => {
