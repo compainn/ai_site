@@ -63,7 +63,7 @@ google = oauth.register(
 )
 
 TELEGRAM_BOT_TOKEN = '8569563154:AAGnzJutAFQNUSpMlKQlSKv9MFaaCtRFyFw'
-GROQ_API_KEY = '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'
+GROQ_API_KEY = '#'
 MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct'
 
 groq_client = Groq(api_key=GROQ_API_KEY)
